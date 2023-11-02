@@ -1,0 +1,24 @@
+tags:
+  - education-periods
+summary: Добавить новый период обучения
+operationId: addEducationPeriod
+requestBody:
+  content:
+    application/json:
+      schema:
+        $ref: "#/components/schemas/education-period/EducationPeriodData.yaml"
+  required: true
+responses:
+  201:
+    description: successfully
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/ID32.yaml"
+  400:
+    description: failed
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/ErrorResponse.yaml"
+x-codegen-request-body-name: body

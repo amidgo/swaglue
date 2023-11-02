@@ -1,0 +1,8 @@
+type: object
+properties:
+  id:
+    $ref: "../ID32.yaml"
+  start_date:
+    $ref: "EducationPeriodStartDate.yaml"
+  end_date:
+    $ref: "EducationPeriodEndDate.yaml"

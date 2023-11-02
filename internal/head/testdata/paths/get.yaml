@@ -1,0 +1,21 @@
+tags:
+  - education-periods
+summary: get all education periods
+parameters:
+  - name: offset
+    in: query
+    required: true
+    schema:
+      $ref: "#/components/parameters/Offset.yaml"
+  - name: limit
+    in: query
+    required: true
+    schema:
+      $ref: "#/components/parameters/Limit.yaml"
+responses:
+  200:
+    description: OK
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/education-period/EducationPeriodPageData.yaml"

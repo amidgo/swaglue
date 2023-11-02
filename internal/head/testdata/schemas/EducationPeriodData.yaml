@@ -1,0 +1,6 @@
+type: object
+properties:
+  start_date:
+    $ref: "EducationPeriodStartDate.yaml"
+  end_date:
+    $ref: "EducationPeriodEndDate.yaml"

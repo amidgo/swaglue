@@ -1,0 +1,19 @@
+tags:
+  - users
+summary: Change User FIO
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      $ref: "#/components/schemas/ID32"
+responses:
+  204:
+    description: ""
+    content: {}
+  400:
+    description: ""
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/ErrorResponse"
