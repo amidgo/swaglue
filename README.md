@@ -88,8 +88,7 @@ responses:
                                 $ref: "#/components/schemas/UserPageData"
 ```
 
-Все компоненты парсятся автоматически 
-Пример использования
+Все компоненты парсятся автоматически
 
 Начальный файл (head) swagger.yaml
 
@@ -116,7 +115,7 @@ components:
 
 ```
 
-Для того чтобы добавить состовляющую в components необходимо добавить флаг --components=component_name=component_content_path
+Для того чтобы добавить состfвляющую в components необходимо добавить флаг --components=component_name=component_content_path
 
 Например
 --components schemas=./schemas
@@ -174,4 +173,4 @@ components:
                 $ref: "#/components/schemas/UserSurname"
 ```
 
-Таким образом мы можем грубо говоря склеивать наш сваггер из маленьких кусочков, которые удобны к изменению
+Таким образом мы можем склеивать наш сваггер из маленьких кусочков, которые удобны к изменению и поддержке
