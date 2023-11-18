@@ -5,56 +5,48 @@ import (
 	"log"
 	"os"
 
-	"github.com/amidgo/swaglue/internal/componentparser"
 	"github.com/amidgo/swaglue/internal/components"
 	"github.com/amidgo/swaglue/internal/head"
-	"github.com/amidgo/swaglue/internal/pathparser"
+	"github.com/amidgo/swaglue/internal/parser"
 )
 
 func Run() {
 	var headFile, componentsData, paths, output string
-	var _debug bool
+	var debug bool
 	flag.StringVar(&headFile, "head", "", "head swagger yaml, should be in .yaml format")
 	flag.StringVar(&componentsData, "components", "", "components with name and directory path, example --components=<name>=<path>,<name>=<path>")
 	flag.StringVar(&paths, "paths", "", "path to paths directory")
 	flag.StringVar(&output, "output", "", "output file")
-	flag.BoolVar(&_debug, "_debug", false, "")
+	flag.BoolVar(&debug, "_debug", false, "")
 	flag.Parse()
 	head, err := head.ParseHeadFromFile(headFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	p := pathparser.NewParser(paths, "#/paths/")
-	err = p.Parse()
+	pathsFiles := ParsePaths(paths, debug)
+	err = head.SetPaths(pathsFiles)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if _debug {
-		log.Printf("paths: %v", p.Files())
-	}
-	err = head.SetPaths(p.Files())
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	components := make(components.Components, 0)
 	err = components.ParseFromString(componentsData)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if _debug {
+	if debug {
 		log.Printf("components: %v, raw:%s", components, componentsData)
 	}
+	var componentParser *parser.SwaggerComponentParser
 	for _, cmpnt := range components {
-		p := componentparser.NewParser(cmpnt.Path)
-		err := p.Parse()
+		componentParser = parser.NewSwaggerComponentParser(cmpnt.Path)
+		err := componentParser.Parse()
 		if err != nil {
 			log.Fatal(err)
 		}
-		if _debug {
-			log.Printf("component %s, component path %s, parser files: %v", cmpnt.Name, cmpnt.Path, p.Files())
+		if debug {
+			log.Printf("component %s, component path %s, parser files: %v", cmpnt.Name, cmpnt.Path, componentParser.Files())
 		}
-		err = head.AppendComponent(cmpnt.Name, p.Files())
+		err = head.AppendComponent(cmpnt.Name, componentParser.Files())
 		if err != nil {
 			log.Fatal(err)
 		}

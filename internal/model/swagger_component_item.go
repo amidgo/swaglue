@@ -2,7 +2,7 @@ package model
 
 import "io"
 
-type Component struct {
+type SwaggerComponentItem struct {
 	Name    string
 	Content io.Reader
 }

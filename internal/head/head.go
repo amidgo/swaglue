@@ -19,7 +19,12 @@ func (e HeadFieldNotFoundError) Error() string {
 	return fmt.Sprintf("field %s not found", e.Field)
 }
 
-type Head yaml.Node
+const defaultEncoderIndent = 2
+
+type Head struct {
+	encoderIndent int
+	headNode      yaml.Node
+}
 
 func ParseHeadFromFile(filePath string) (Head, error) {
 	file, err := os.OpenFile(filePath, os.O_RDONLY, os.ModePerm)
@@ -36,20 +41,13 @@ func ParseHead(r io.Reader) (Head, error) {
 	if err != nil {
 		return Head{}, fmt.Errorf("failed unmarshal data, %w", err)
 	}
-	return Head(node), nil
+	return Head{
+		headNode:      node,
+		encoderIndent: defaultEncoderIndent,
+	}, nil
 }
 
-func (h Head) SaveTo(w io.Writer) error {
-	encoder := yaml.NewEncoder(w)
-	err := encoder.Encode((*yaml.Node)(&h))
-	encoder.Close()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (h Head) SaveToFile(filePath string, flag int, mode os.FileMode) error {
+func (h *Head) SaveToFile(filePath string, flag int, mode os.FileMode) error {
 	f, err := os.OpenFile(filePath, flag, mode)
 	if err != nil {
 		return err
@@ -57,40 +55,49 @@ func (h Head) SaveToFile(filePath string, flag int, mode os.FileMode) error {
 	return h.SaveTo(f)
 }
 
-func (h Head) SearchTag(tag string) *yaml.Node {
-	var node *yaml.Node = (*yaml.Node)(&h)
+func (h *Head) SaveTo(w io.Writer) error {
+	encoder := yaml.NewEncoder(w)
+	encoder.SetIndent(h.encoderIndent)
+	err := encoder.Encode(&h.headNode)
+	defer encoder.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *Head) SearchTag(tag string) *yaml.Node {
+	var node *yaml.Node = &h.headNode
 	for {
 		switch node.Kind {
 		case yaml.DocumentNode:
 			node = node.Content[0]
 			continue
 		case yaml.MappingNode:
-			return searchInContent(node, func(n *yaml.Node) bool { return n.Value == tag })
+			return searchInContent(node, tag)
 		case yaml.SequenceNode:
-			return searchInContent(node, func(n *yaml.Node) bool { return n.Value == tag })
+			return searchInContent(node, tag)
 		}
 		return nil
 	}
 }
 
-func searchInContent(node *yaml.Node, f func(*yaml.Node) bool) *yaml.Node {
+func searchInContent(node *yaml.Node, tag string) *yaml.Node {
 	nodes := node.Content
 	for i := range nodes {
 		if i == len(nodes)-1 {
 			return nil
 		}
-		if f(nodes[i]) {
+		if nodes[i].Value == tag {
 			return nodes[i+1]
 		}
 	}
 	return nil
 }
 
-type Decoder struct{ *yaml.Decoder }
-
-func (d Decoder) Node() *yaml.Node {
+func DecodeYamlNode(dec *yaml.Decoder) *yaml.Node {
 	var n yaml.Node
-	err := d.Decode(&n)
+	err := dec.Decode(&n)
 	if err != nil {
 		return nil
 	}

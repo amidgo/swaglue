@@ -81,15 +81,15 @@ type PathRoute struct {
 
 type PathRouteMethod [2]*yaml.Node
 
-func (p PathRouteMethod) Valid() bool {
+func (p *PathRouteMethod) Valid() bool {
 	return p[0].Value == "$ref" && p[1].Value != ""
 }
 
-func (p PathRouteMethod) Ref() string {
+func (p *PathRouteMethod) Ref() string {
 	return p[1].Value
 }
 
-func (p PathRoute) Handle(paths map[string]io.Reader) error {
+func (p *PathRoute) Handle(paths map[string]io.Reader) error {
 	if !(p.Node.Kind == yaml.MappingNode || p.Node.Kind == yaml.SequenceNode) {
 		return nil
 	}
@@ -111,7 +111,7 @@ func (p PathRoute) Handle(paths map[string]io.Reader) error {
 		if !ok {
 			return fmt.Errorf("%w, ref %s not found, line %d", InvalidRef, ref, next.Line)
 		}
-		node := Decoder{yaml.NewDecoder(r)}.Node()
+		node := DecodeYamlNode(yaml.NewDecoder(r))
 		if node == nil {
 			return fmt.Errorf("%w, for ref %s", FailedDecodeFile, ref)
 		}
