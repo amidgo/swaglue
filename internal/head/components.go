@@ -8,14 +8,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const components_tag = "components"
+
 var (
-	NoComponentsTag = errors.New("'components' tag not found")
+	ErrNoComponentsTag = errors.New("'components' tag not found")
 )
 
 func (h Head) AppendComponent(componentName string, componentItems []*model.SwaggerComponentItem) error {
-	componentTag := h.SearchTag("components")
+	componentTag := h.SearchTag(components_tag)
 	if componentTag == nil {
-		return NoComponentsTag
+		return ErrNoComponentsTag
 	}
 	if len(componentTag.Content) == 0 {
 		componentTag.Kind = yaml.MappingNode
@@ -79,7 +81,7 @@ func (c *ComponentNodeBuilder) appendComponent(component *model.SwaggerComponent
 	dec := yaml.NewDecoder(component.Content)
 	itemNode := DecodeYamlNode(dec)
 	if itemNode == nil {
-		return fmt.Errorf("%w, for %s", FailedDecodeFile, component.Name)
+		return fmt.Errorf("%w, for %s", ErrFailedDecodeFile, component.Name)
 	}
 	c.appendItems(namedNode, itemNode)
 	return nil

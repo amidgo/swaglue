@@ -4,62 +4,29 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 
 	"gopkg.in/yaml.v3"
 )
 
+const path_tag = "paths"
+
 var (
-	NoPathTag     = errors.New("'paths' tag not found")
-	WrongPathKind = errors.New("wrong path kind, expected map")
-	InvalidRef    = errors.New("invalid ref value")
+	ErrNoPathTag     = errors.New("'paths' tag not found")
+	ErrWrongPathKind = errors.New("wrong path kind, expected map")
+	ErrInvalidRef    = errors.New("invalid ref value")
 )
-
-type HttpMethod string
-
-const (
-	MethodGet     HttpMethod = "get"
-	MethodHead    HttpMethod = "head"
-	MethodPost    HttpMethod = "post"
-	MethodPut     HttpMethod = "put"
-	MethodPatch   HttpMethod = "patch"
-	MethodDelete  HttpMethod = "delete"
-	MethodConnect HttpMethod = "connect"
-	MethodOptions HttpMethod = "options"
-	MethodTrace   HttpMethod = "trace"
-)
-
-func (h HttpMethod) Valid() bool {
-	for _, method := range []HttpMethod{
-		MethodGet,
-		MethodHead,
-		MethodPost,
-		MethodPut,
-		MethodPatch,
-		MethodDelete,
-		MethodConnect,
-		MethodOptions,
-		MethodTrace,
-	} {
-		if h == method {
-			return true
-		}
-	}
-	return false
-}
 
 func (h Head) SetPaths(paths map[string]io.Reader) error {
-	pathNode := h.SearchTag("paths")
+	pathNode := h.SearchTag(path_tag)
 	if err := validatePathNode(pathNode); err != nil {
 		return err
 	}
-	log.Println(pathNode.Value)
 	pathChilds := pathNode.Content
 	for i := range pathChilds {
 		route := PathRoute{Node: pathChilds[i]}
 		err := route.Handle(paths)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed handle paths")
 		}
 	}
 	return nil
@@ -67,10 +34,10 @@ func (h Head) SetPaths(paths map[string]io.Reader) error {
 
 func validatePathNode(pathNode *yaml.Node) error {
 	if pathNode == nil {
-		return NoPathTag
+		return ErrNoPathTag
 	}
 	if pathNode.Kind != yaml.MappingNode {
-		return fmt.Errorf("%w, actual %s", WrongPathKind, pathNode.Tag)
+		return fmt.Errorf("%w, actual %s", ErrWrongPathKind, pathNode.Tag)
 	}
 	return nil
 }
@@ -79,18 +46,8 @@ type PathRoute struct {
 	Node *yaml.Node
 }
 
-type PathRouteMethod [2]*yaml.Node
-
-func (p *PathRouteMethod) Valid() bool {
-	return p[0].Value == "$ref" && p[1].Value != ""
-}
-
-func (p *PathRouteMethod) Ref() string {
-	return p[1].Value
-}
-
 func (p *PathRoute) Handle(paths map[string]io.Reader) error {
-	if !(p.Node.Kind == yaml.MappingNode || p.Node.Kind == yaml.SequenceNode) {
+	if !p.isContentableNodeKind() {
 		return nil
 	}
 	nodes := p.Node.Content
@@ -109,13 +66,30 @@ func (p *PathRoute) Handle(paths map[string]io.Reader) error {
 		ref := pathRouteMethod.Ref()
 		r, ok := paths[ref]
 		if !ok {
-			return fmt.Errorf("%w, ref %s not found, line %d", InvalidRef, ref, next.Line)
+			return fmt.Errorf("%w, ref %s not found, line %d", ErrInvalidRef, ref, next.Line)
 		}
 		node := DecodeYamlNode(yaml.NewDecoder(r))
 		if node == nil {
-			return fmt.Errorf("%w, for ref %s", FailedDecodeFile, ref)
+			return fmt.Errorf("%w, for ref %s", ErrFailedDecodeFile, ref)
 		}
 		nodes[i+1] = node
 	}
 	return nil
+}
+
+func (p *PathRoute) isContentableNodeKind() bool {
+	return p.Node.Kind == yaml.MappingNode || p.Node.Kind == yaml.SequenceNode
+}
+
+type PathRouteMethod []*yaml.Node
+
+func (p PathRouteMethod) Valid() bool {
+	if len(p) != 2 {
+		return false
+	}
+	return p[0].Value == "$ref" && p[1].Value != ""
+}
+
+func (p PathRouteMethod) Ref() string {
+	return p[1].Value
 }

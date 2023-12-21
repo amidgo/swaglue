@@ -9,7 +9,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var FailedDecodeFile = errors.New("failed decode file to .yaml")
+var (
+	ErrFailedDecodeFile = errors.New("failed decode file to .yaml")
+)
 
 type HeadFieldNotFoundError struct {
 	Field string

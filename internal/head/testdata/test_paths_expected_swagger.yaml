@@ -1,0 +1,81 @@
+openapi: 3.0.1
+info:
+  title: ESUS API
+  description: esus-api for crud operations
+  termsOfService: http://swagger.io/terms/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:10024/api/v1
+tags:
+  - name: education-periods
+    description: Управление учебными периодами
+  - name: admission-orders
+    description: Управление приказами о зачислении
+  - name: educational-departments
+    description: Управление учебными отделениями
+  - name: teachers
+    description: Управление преподавателями
+  - name: curriculums
+    description: Управление учебными планами
+  - name: curriculum-disciplines
+    description: Управление дисциплинами учебного плана
+  - name: disciplines
+    description: Управление всеми учебными дисциплинами
+  - name: groups
+    description: Управление учебными группами
+paths:
+  /education-periods:
+    get:
+      tags:
+        - education-periods
+      summary: get all education periods
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/parameters/Offset.yaml"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/parameters/Limit.yaml"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/education-period/EducationPeriodPageData.yaml"
+    post:
+      tags:
+        - education-periods
+      summary: Добавить новый период обучения
+      operationId: addEducationPeriod
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/education-period/EducationPeriodData.yaml"
+        required: true
+      responses:
+        201:
+          description: successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ID32.yaml"
+        400:
+          description: failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse.yaml"
+      x-codegen-request-body-name: body
+components:
