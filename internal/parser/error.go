@@ -7,11 +7,11 @@ type FailedReadFileError struct {
 	Err      error
 }
 
-func (e FailedReadFileError) Error() string {
+func (e *FailedReadFileError) Error() string {
 	return fmt.Sprintf("failed read file: %s, err: %s", e.FilePath, e.Err)
 }
 
-func (e FailedReadFileError) Unwrap() error {
+func (e *FailedReadFileError) Unwrap() error {
 	return e.Err
 }
 
@@ -20,10 +20,10 @@ type FailedReadDirectoryError struct {
 	Err           error
 }
 
-func (e FailedReadDirectoryError) Error() string {
+func (e *FailedReadDirectoryError) Error() string {
 	return fmt.Sprintf("failed read directory: %s, err: %s", e.DirectoryPath, e.Err)
 }
 
-func (e FailedReadDirectoryError) Unwrap() error {
+func (e *FailedReadDirectoryError) Unwrap() error {
 	return e.Err
 }

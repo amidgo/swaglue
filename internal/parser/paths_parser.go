@@ -7,7 +7,7 @@ import (
 
 type SwaggerPathParser struct {
 	*swaggerPathFileHandler
-	*parser
+	*yamlFileParser
 }
 
 func NewSwaggerPathParser(basePackage string, keyPrefix string) *SwaggerPathParser {
@@ -15,13 +15,13 @@ func NewSwaggerPathParser(basePackage string, keyPrefix string) *SwaggerPathPars
 		keyPrefix: keyPrefix,
 		files:     make(map[string]io.Reader),
 	}
-	parser := &parser{
+	parser := &yamlFileParser{
 		basePackage: basePackage,
 		fileHandler: pathFileHandler,
 	}
 	return &SwaggerPathParser{
 		swaggerPathFileHandler: pathFileHandler,
-		parser:                 parser,
+		yamlFileParser:         parser,
 	}
 }
 

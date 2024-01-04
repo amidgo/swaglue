@@ -20,6 +20,13 @@ func Run() {
 	if err != nil {
 		log.Fatalf("failed set head paths, %s", err)
 	}
+
+	routes := config.ParseRoutes()
+	err = head.AppendRoutes(routes)
+	if err != nil {
+		log.Fatalf("failed set append routes, %s", err)
+	}
+
 	components, err := components.ParseComponentsFromString(config.ComponentsData)
 	if err != nil {
 		log.Fatalf("failed parse components from string, %s", err)
@@ -30,7 +37,7 @@ func Run() {
 		componentParser = parser.NewSwaggerComponentParser(cmpnt.Path)
 		err := componentParser.Parse()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed parse component, %s", err)
 		}
 		if config.Debug {
 			log.Printf("component %s, component path %s, parser files: %v", cmpnt.Name, cmpnt.Path, componentParser.Files())

@@ -23,10 +23,11 @@ var (
 func TestPaths(t *testing.T) {
 	head, err := head.ParseHeadFromFile("testdata/swagger.yaml")
 	assert.NoError(t, err, "failed open swagger.yaml")
-	head.SetPaths(map[string]io.Reader{
+	err = head.SetPaths(map[string]io.Reader{
 		"#/paths/get":  bytes.NewReader(getPathData),
 		"#/paths/post": bytes.NewReader(postPathData),
 	})
+	assert.Nil(t, err, "failed set paths")
 	buf := &bytes.Buffer{}
 	err = head.SaveTo(buf)
 	assert.NoError(t, err, "failed save file")

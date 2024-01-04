@@ -10,20 +10,20 @@ import (
 
 type SwaggerComponentParser struct {
 	*swaggerComponentFileHandler
-	*parser
+	*yamlFileParser
 }
 
 func NewSwaggerComponentParser(basePackage string) *SwaggerComponentParser {
 	swaggerComponentFileHandler := &swaggerComponentFileHandler{
 		files: make([]*model.SwaggerComponentItem, 0),
 	}
-	parser := &parser{
+	parser := &yamlFileParser{
 		basePackage: basePackage,
 		fileHandler: swaggerComponentFileHandler,
 	}
 	return &SwaggerComponentParser{
 		swaggerComponentFileHandler: swaggerComponentFileHandler,
-		parser:                      parser,
+		yamlFileParser:              parser,
 	}
 }
 

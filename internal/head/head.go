@@ -97,19 +97,21 @@ func searchInContent(node *yaml.Node, tag string) *yaml.Node {
 	return nil
 }
 
-func DecodeYamlNode(dec *yaml.Decoder) *yaml.Node {
+var ErrWrongYamlDocumentNodeFormat = errors.New("wrong yaml document node format")
+
+func DecodeYamlNode(dec *yaml.Decoder) (*yaml.Node, error) {
 	var n yaml.Node
 	err := dec.Decode(&n)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("failed decode yaml node, err: %w", err)
 	}
 	switch n.Kind {
 	case yaml.DocumentNode:
 		if len(n.Content) == 0 {
-			return nil
+			return nil, ErrWrongYamlDocumentNodeFormat
 		}
-		return n.Content[0]
+		return n.Content[0], nil
 	default:
-		return &n
+		return &n, nil
 	}
 }

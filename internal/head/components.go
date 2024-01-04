@@ -79,9 +79,9 @@ func (c *ComponentNodeBuilder) appendComponent(component *model.SwaggerComponent
 		Value: component.Name,
 	}
 	dec := yaml.NewDecoder(component.Content)
-	itemNode := DecodeYamlNode(dec)
-	if itemNode == nil {
-		return fmt.Errorf("%w, for %s", ErrFailedDecodeFile, component.Name)
+	itemNode, err := DecodeYamlNode(dec)
+	if err != nil {
+		return fmt.Errorf("%w, for %s, err: %w", ErrFailedDecodeFile, component.Name, err)
 	}
 	c.appendItems(namedNode, itemNode)
 	return nil

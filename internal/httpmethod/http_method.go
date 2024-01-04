@@ -1,4 +1,4 @@
-package head
+package httpmethod
 
 type HttpMethod string
 
@@ -14,8 +14,8 @@ const (
 	MethodTrace   HttpMethod = "trace"
 )
 
-func (h HttpMethod) Valid() bool {
-	for _, method := range []HttpMethod{
+var (
+	HttpMethodList = [9]HttpMethod{
 		MethodGet,
 		MethodHead,
 		MethodPost,
@@ -24,11 +24,18 @@ func (h HttpMethod) Valid() bool {
 		MethodDelete,
 		MethodConnect,
 		MethodOptions,
-		MethodTrace,
-	} {
+	}
+)
+
+func (h HttpMethod) Valid() bool {
+	for _, method := range HttpMethodList {
 		if h == method {
 			return true
 		}
 	}
 	return false
+}
+
+func Valid(method string) bool {
+	return HttpMethod(method).Valid()
 }

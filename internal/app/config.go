@@ -6,12 +6,13 @@ import (
 	"log"
 
 	"github.com/amidgo/swaglue/internal/components"
+	"github.com/amidgo/swaglue/internal/model"
 	"github.com/amidgo/swaglue/internal/parser"
 )
 
 type Config struct {
-	HeadFile, ComponentsData, Paths, Output string
-	Debug                                   bool
+	HeadFile, ComponentsData, Paths, Routes, Output string
+	Debug                                           bool
 }
 
 func (c Config) ParsePaths() map[string]io.Reader {
@@ -26,6 +27,15 @@ func (c Config) ParsePaths() map[string]io.Reader {
 	return pathParser.Files()
 }
 
+func (c Config) ParseRoutes() []*model.Route {
+	routeParser := parser.NewRouteParser(c.Routes)
+	err := routeParser.Parse()
+	if err != nil {
+		log.Fatalf("parse routes, err: %s", err)
+	}
+	return routeParser.Routes()
+}
+
 func (c Config) PrintComponents(components []*components.Component) {
 	if c.Debug {
 		log.Printf("components: %v, raw:%s", components, c.ComponentsData)
@@ -33,11 +43,12 @@ func (c Config) PrintComponents(components []*components.Component) {
 }
 
 func parseConfigFromFlags() Config {
-	var headFile, componentsData, paths, output string
+	var headFile, componentsData, paths, routes, output string
 	var debug bool
 	flag.StringVar(&headFile, "head", "", "head swagger yaml, should be in .yaml format")
 	flag.StringVar(&componentsData, "components", "", "components with name and directory path, example --components=<name>=<path>,<name>=<path>")
 	flag.StringVar(&paths, "paths", "", "path to paths directory")
+	flag.StringVar(&routes, "routes", "", "routes")
 	flag.StringVar(&output, "output", "", "output file")
 	flag.BoolVar(&debug, "_debug", false, "")
 	flag.Parse()
@@ -45,6 +56,7 @@ func parseConfigFromFlags() Config {
 		HeadFile:       headFile,
 		ComponentsData: componentsData,
 		Paths:          paths,
+		Routes:         routes,
 		Output:         output,
 		Debug:          debug,
 	}
