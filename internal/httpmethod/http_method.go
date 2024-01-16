@@ -1,21 +1,21 @@
 package httpmethod
 
-type HttpMethod string
+type HTTPMethod string
 
 const (
-	MethodGet     HttpMethod = "get"
-	MethodHead    HttpMethod = "head"
-	MethodPost    HttpMethod = "post"
-	MethodPut     HttpMethod = "put"
-	MethodPatch   HttpMethod = "patch"
-	MethodDelete  HttpMethod = "delete"
-	MethodConnect HttpMethod = "connect"
-	MethodOptions HttpMethod = "options"
-	MethodTrace   HttpMethod = "trace"
+	MethodGet     HTTPMethod = "get"
+	MethodHead    HTTPMethod = "head"
+	MethodPost    HTTPMethod = "post"
+	MethodPut     HTTPMethod = "put"
+	MethodPatch   HTTPMethod = "patch"
+	MethodDelete  HTTPMethod = "delete"
+	MethodConnect HTTPMethod = "connect"
+	MethodOptions HTTPMethod = "options"
+	MethodTrace   HTTPMethod = "trace"
 )
 
-var (
-	HttpMethodList = [9]HttpMethod{
+func (h HTTPMethod) Valid() bool {
+	methodList := [9]HTTPMethod{
 		MethodGet,
 		MethodHead,
 		MethodPost,
@@ -25,17 +25,15 @@ var (
 		MethodConnect,
 		MethodOptions,
 	}
-)
-
-func (h HttpMethod) Valid() bool {
-	for _, method := range HttpMethodList {
+	for _, method := range methodList {
 		if h == method {
 			return true
 		}
 	}
+
 	return false
 }
 
 func Valid(method string) bool {
-	return HttpMethod(method).Valid()
+	return HTTPMethod(method).Valid()
 }

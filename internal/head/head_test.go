@@ -8,6 +8,7 @@ import (
 	"github.com/amidgo/swaglue/internal/head"
 	"github.com/amidgo/swaglue/internal/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -22,8 +23,9 @@ var componentExpectedSwagger []byte
 
 func Test_Head_AppendComponent(t *testing.T) {
 	head, err := head.ParseHeadFromFile("testdata/swagger.yaml")
-	assert.NoError(t, err, "failed open swagger.yaml")
-	head.AppendComponent("schemas", []*model.SwaggerComponentItem{
+	require.NoError(t, err, "failed open swagger.yaml")
+
+	err = head.AppendComponent("schemas", []*model.SwaggerComponentItem{
 		{
 			Name:    "EducationPeriod",
 			Content: bytes.NewReader(educationPeriodSchema),
@@ -33,8 +35,11 @@ func Test_Head_AppendComponent(t *testing.T) {
 			Content: bytes.NewReader(educationPeriodData),
 		},
 	})
+	require.NoError(t, err, "failed append components")
+
 	buf := &bytes.Buffer{}
 	err = head.SaveTo(buf)
-	assert.NoError(t, err, "failed save file")
+	require.NoError(t, err, "failed save file")
+
 	assert.Equal(t, componentExpectedSwagger, buf.Bytes())
 }

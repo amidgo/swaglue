@@ -13,12 +13,13 @@ type SwaggerPathParser struct {
 func NewSwaggerPathParser(basePackage string, keyPrefix string) *SwaggerPathParser {
 	pathFileHandler := &swaggerPathFileHandler{
 		keyPrefix: keyPrefix,
-		files:     make(map[string]io.Reader),
+		paths:     make(map[string]io.Reader),
 	}
 	parser := &yamlFileParser{
 		basePackage: basePackage,
 		fileHandler: pathFileHandler,
 	}
+
 	return &SwaggerPathParser{
 		swaggerPathFileHandler: pathFileHandler,
 		yamlFileParser:         parser,
@@ -27,17 +28,17 @@ func NewSwaggerPathParser(basePackage string, keyPrefix string) *SwaggerPathPars
 
 type swaggerPathFileHandler struct {
 	keyPrefix string
-	files     map[string]io.Reader
+	paths     map[string]io.Reader
 }
 
-func (p *swaggerPathFileHandler) Files() map[string]io.Reader {
-	return p.files
+func (p *swaggerPathFileHandler) Paths() map[string]io.Reader {
+	return p.paths
 }
 
 func (p *swaggerPathFileHandler) HandleFile(relativeFilePath string, file io.Reader) {
 	relativeFilePath = strings.TrimSuffix(relativeFilePath, ".yaml")
 	key := p.fileKey(relativeFilePath)
-	p.files[key] = file
+	p.paths[key] = file
 }
 
 func (p *swaggerPathFileHandler) fileKey(filePath string) string {

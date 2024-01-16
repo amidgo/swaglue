@@ -7,6 +7,7 @@ import (
 
 	"github.com/amidgo/swaglue/internal/parser"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -21,14 +22,14 @@ func TestSwaggerPathParser(t *testing.T) {
 		basePackage = "./testdata/path"
 		keyPrefix   = "#/paths/"
 	)
+
 	parser := parser.NewSwaggerPathParser(basePackage, keyPrefix)
 
 	err := parser.Parse()
-	assert.NoError(t, err, "failed parse")
+	require.NoError(t, err, "failed parse")
 
-	files := parser.Files()
-
-	assert.Equal(t, len(files), 2, "wrong len")
+	files := parser.Paths()
+	assert.Len(t, files, 2, "wrong len")
 
 	postContent, _ := io.ReadAll(files["#/paths/groups/post"])
 	assert.Equal(t, postContent, groupsPostFileContent)

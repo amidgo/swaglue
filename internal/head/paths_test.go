@@ -8,6 +8,7 @@ import (
 
 	"github.com/amidgo/swaglue/internal/head"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -22,14 +23,17 @@ var (
 
 func TestPaths(t *testing.T) {
 	head, err := head.ParseHeadFromFile("testdata/swagger.yaml")
-	assert.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "failed open swagger.yaml")
+
 	err = head.SetPaths(map[string]io.Reader{
 		"#/paths/get":  bytes.NewReader(getPathData),
 		"#/paths/post": bytes.NewReader(postPathData),
 	})
-	assert.Nil(t, err, "failed set paths")
+	require.NoError(t, err, "failed set paths")
+
 	buf := &bytes.Buffer{}
 	err = head.SaveTo(buf)
-	assert.NoError(t, err, "failed save file")
+	require.NoError(t, err, "failed save file")
+
 	assert.Equal(t, pathsExpectedData, buf.Bytes())
 }

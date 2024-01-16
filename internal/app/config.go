@@ -16,23 +16,36 @@ type Config struct {
 }
 
 func (c Config) ParsePaths() map[string]io.Reader {
+	if c.Paths == "" {
+		return map[string]io.Reader{}
+	}
+
 	pathParser := parser.NewSwaggerPathParser(c.Paths, "#/paths/")
+
 	err := pathParser.Parse()
 	if err != nil {
 		log.Fatalf("parse paths, err: %s", err)
 	}
+
 	if c.Debug {
-		log.Printf("paths: %v", pathParser.Files())
+		log.Printf("paths: %v", pathParser.Paths())
 	}
-	return pathParser.Files()
+
+	return pathParser.Paths()
 }
 
 func (c Config) ParseRoutes() []*model.Route {
+	if c.Routes == "" {
+		return []*model.Route{}
+	}
+
 	routeParser := parser.NewRouteParser(c.Routes)
+
 	err := routeParser.Parse()
 	if err != nil {
 		log.Fatalf("parse routes, err: %s", err)
 	}
+
 	return routeParser.Routes()
 }
 
@@ -43,15 +56,24 @@ func (c Config) PrintComponents(components []*components.Component) {
 }
 
 func parseConfigFromFlags() Config {
-	var headFile, componentsData, paths, routes, output string
-	var debug bool
+	var (
+		headFile, componentsData, paths, routes, output string
+		debug                                           bool
+	)
+
 	flag.StringVar(&headFile, "head", "", "head swagger yaml, should be in .yaml format")
-	flag.StringVar(&componentsData, "components", "", "components with name and directory path, example --components=<name>=<path>,<name>=<path>")
+	flag.StringVar(
+		&componentsData,
+		"components",
+		"",
+		"components with name and directory path, example --components=<name>=<path>,<name>=<path>",
+	)
 	flag.StringVar(&paths, "paths", "", "path to paths directory")
-	flag.StringVar(&routes, "routes", "", "routes")
+	flag.StringVar(&routes, "routes", "", "path to routes directory")
 	flag.StringVar(&output, "output", "", "output file")
 	flag.BoolVar(&debug, "_debug", false, "")
 	flag.Parse()
+
 	return Config{
 		HeadFile:       headFile,
 		ComponentsData: componentsData,

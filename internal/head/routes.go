@@ -9,32 +9,36 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var (
-	ErrInvalidTypePathsNode = errors.New("invalid type of paths node")
-)
+var ErrInvalidTypePathsNode = errors.New("invalid type of paths node")
 
 func (h Head) AppendRoutes(routes []*model.Route) (err error) {
-	pathNode := h.SearchTag(path_tag)
+	pathNode := h.SearchTag(pathsTag)
 	if pathNode == nil {
 		return ErrNoPathTag
 	}
+
 	if len(pathNode.Content) == 0 {
 		pathNode.Kind = yaml.MappingNode
 		pathNode.Tag = ""
 	}
+
 	existsRouteMethods := MakeExistsRouteMethods()
+
 	err = existsRouteMethods.ScanNode(pathNode)
 	if err != nil {
 		return err
 	}
+
 	routePathNode := RoutePathNode{
 		ExistsRouteMethods: existsRouteMethods,
 		Node:               pathNode,
 	}
+
 	err = routePathNode.AppendRoutes(routes)
 	if err != nil {
 		return fmt.Errorf("failed append routes to path node, err: %w", err)
 	}
+
 	return nil
 }
 
@@ -57,6 +61,7 @@ func (r *RoutePathNode) AppendRoutes(routes []*model.Route) error {
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -67,10 +72,12 @@ func (r *RoutePathNode) appendRouteMethodsToExistsRoute(route *model.Route) erro
 	if err != nil {
 		return err
 	}
+
 	err = r.addRouteMethods(route)
 	if err != nil {
 		return fmt.Errorf("failed append route methods, err: %w", err)
 	}
+
 	return nil
 }
 
@@ -79,9 +86,18 @@ func (r *RoutePathNode) detectRouteMethodsConflits(route *model.Route) error {
 	for _, routeMethod := range route.Methods {
 		methods = append(methods, routeMethod.Method)
 	}
+
 	if existsMethods, exists := r.ExistsRouteMethods.AnyRouteMethodExists(route.Name, methods); exists {
-		return fmt.Errorf("%w, route %s, route methods %s already exists in head file", ErrDetectRouteMethodsConflicts, route.Name, strings.Join(existsMethods, ","))
+		methodsString := strings.Join(existsMethods, ",")
+
+		return fmt.Errorf(
+			"%w, route %s, route methods %s already exists in head file",
+			ErrDetectRouteMethodsConflicts,
+			route.Name,
+			methodsString,
+		)
 	}
+
 	return nil
 }
 
@@ -90,12 +106,14 @@ func (r *RoutePathNode) addRouteMethods(route *model.Route) error {
 	if err != nil {
 		return err
 	}
+
 	for _, method := range route.Methods {
 		err := routeMethodContentNode.AddMethod(method)
 		if err != nil {
 			return fmt.Errorf("failed add method, err: %w", err)
 		}
 	}
+
 	return nil
 }
 
@@ -110,12 +128,15 @@ func (r *RoutePathNode) appendRoute(route *model.Route) error {
 			Content: make([]*yaml.Node, 0),
 		},
 	}
+
 	for _, method := range route.Methods {
 		err := pathMethodsRoute.AddMethod(method)
 		if err != nil {
 			return fmt.Errorf("failed add method, err: %w", err)
 		}
 	}
+
 	r.Node.Content = append(r.Node.Content, pathNameRoute, pathMethodsRoute.Node)
+
 	return nil
 }

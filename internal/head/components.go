@@ -8,21 +8,21 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const components_tag = "components"
+const componenetsTag = "components"
 
-var (
-	ErrNoComponentsTag = errors.New("'components' tag not found")
-)
+var ErrNoComponentsTag = errors.New("'components' tag not found")
 
 func (h Head) AppendComponent(componentName string, componentItems []*model.SwaggerComponentItem) error {
-	componentTag := h.SearchTag(components_tag)
+	componentTag := h.SearchTag(componenetsTag)
 	if componentTag == nil {
 		return ErrNoComponentsTag
 	}
+
 	if len(componentTag.Content) == 0 {
 		componentTag.Kind = yaml.MappingNode
 		componentTag.Tag = ""
 	}
+
 	nodes, err := new(ComponentNodeBuilder).
 		SetName(componentName).
 		SetItems(componentItems).
@@ -30,7 +30,9 @@ func (h Head) AppendComponent(componentName string, componentItems []*model.Swag
 	if err != nil {
 		return err
 	}
+
 	componentTag.Content = append(componentTag.Content, nodes...)
+
 	return nil
 }
 
@@ -44,10 +46,12 @@ func (c *ComponentNodeBuilder) SetName(name string) *ComponentNodeBuilder {
 	if c.err != nil {
 		return c
 	}
+
 	c.namedNode = &yaml.Node{
 		Kind:  yaml.ScalarNode,
 		Value: name,
 	}
+
 	return c
 }
 
@@ -55,11 +59,13 @@ func (c *ComponentNodeBuilder) SetItems(items []*model.SwaggerComponentItem) *Co
 	if c.err != nil {
 		return c
 	}
+
 	c.itemsNode = &yaml.Node{
 		Kind:    yaml.MappingNode,
 		Content: make([]*yaml.Node, 0, len(items)),
 	}
 	c.appendComponents(items)
+
 	return c
 }
 
@@ -68,6 +74,7 @@ func (c *ComponentNodeBuilder) appendComponents(components []*model.SwaggerCompo
 		err := c.appendComponent(component)
 		if err != nil {
 			c.err = err
+
 			return
 		}
 	}
@@ -79,11 +86,14 @@ func (c *ComponentNodeBuilder) appendComponent(component *model.SwaggerComponent
 		Value: component.Name,
 	}
 	dec := yaml.NewDecoder(component.Content)
+
 	itemNode, err := DecodeYamlNode(dec)
 	if err != nil {
 		return fmt.Errorf("%w, for %s, err: %w", ErrFailedDecodeFile, component.Name, err)
 	}
+
 	c.appendItems(namedNode, itemNode)
+
 	return nil
 }
 

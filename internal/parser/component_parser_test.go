@@ -8,6 +8,7 @@ import (
 
 	"github.com/amidgo/swaglue/internal/parser"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -22,10 +23,10 @@ func TestSwaggerComponentParser(t *testing.T) {
 
 	parser := parser.NewSwaggerComponentParser(basePackage)
 	err := parser.Parse()
-	assert.NoError(t, err, "failed parse")
+	require.NoError(t, err, "failed parse")
 
 	files := parser.Files()
-	assert.Equal(t, len(files), 2, "wrong files length")
+	assert.Len(t, files, 2, "wrong files length")
 
 	animalFileContentEqual := readerEqualContent(files[0].Content, animalNameFileContent)
 	assert.True(t, animalFileContentEqual, "animal file content not equal")
@@ -35,6 +36,10 @@ func TestSwaggerComponentParser(t *testing.T) {
 }
 
 func readerEqualContent(r io.Reader, content []byte) bool {
-	data, _ := io.ReadAll(r)
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return false
+	}
+
 	return slices.Equal(data, content)
 }

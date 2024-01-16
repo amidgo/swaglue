@@ -21,6 +21,7 @@ func NewSwaggerComponentParser(basePackage string) *SwaggerComponentParser {
 		basePackage: basePackage,
 		fileHandler: swaggerComponentFileHandler,
 	}
+
 	return &SwaggerComponentParser{
 		swaggerComponentFileHandler: swaggerComponentFileHandler,
 		yamlFileParser:              parser,
