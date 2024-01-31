@@ -37,5 +37,5 @@ func Detect(format string) (*SliceFileFormat, error) {
 		return JSON(), nil
 	}
 
-	return nil, ErrFailedDetectFileFormat
+	return &SliceFileFormat{}, ErrFailedDetectFileFormat
 }
