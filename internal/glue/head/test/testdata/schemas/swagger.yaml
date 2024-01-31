@@ -1,0 +1,47 @@
+openapi: 3.0.1
+info:
+  title: ESUS API
+  description: esus-api for crud operations
+  termsOfService: http://swagger.io/terms/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:10024/api/v1
+tags:
+  - name: education-periods
+    description: Управление учебными периодами
+  - name: admission-orders
+    description: Управление приказами о зачислении
+  - name: educational-departments
+    description: Управление учебными отделениями
+  - name: teachers
+    description: Управление преподавателями
+  - name: curriculums
+    description: Управление учебными планами
+  - name: curriculum-disciplines
+    description: Управление дисциплинами учебного плана
+  - name: disciplines
+    description: Управление всеми учебными дисциплинами
+  - name: groups
+    description: Управление учебными группами
+paths:
+  /education-periods:
+    get:
+      $ref: "#/paths/get"
+    post:
+      $ref: "#/paths/post"
+components:
+  random_component:
+    Hello:
+      type: object
+      items:
+        $ref: "aboba"
+  aboba:
+    bebe:
+      items:
+        name: biba

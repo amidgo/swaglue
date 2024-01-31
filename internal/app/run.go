@@ -4,63 +4,32 @@ import (
 	"log"
 	"os"
 
-	"github.com/amidgo/swaglue/internal/components"
-	"github.com/amidgo/swaglue/internal/head"
-	"github.com/amidgo/swaglue/internal/parser"
+	"github.com/amidgo/swaglue/internal/glue"
+	"github.com/amidgo/swaglue/internal/solv"
+)
+
+const (
+	MinArgsCount = 2
+
+	CommandGlue = "glue"
+	CommandSolv = "solv"
 )
 
 func Run() {
-	config := parseConfigFromFlags()
+	args := os.Args
 
-	head, err := head.ParseHeadFromFile(config.HeadFile)
-	if err != nil {
-		log.Fatalf("failed parse head from file, %s", err)
+	if len(os.Args) < MinArgsCount {
+		log.Fatal("no args")
 	}
 
-	pathsFiles := config.ParsePaths()
+	command := args[1]
 
-	err = head.SetPaths(pathsFiles)
-	if err != nil {
-		log.Fatalf("failed set head paths, %s", err)
-	}
-
-	routes := config.ParseRoutes()
-
-	err = head.AppendRoutes(routes)
-	if err != nil {
-		log.Fatalf("failed set append routes, %s", err)
-	}
-
-	components, err := components.ParseComponentsFromString(config.ComponentsData)
-	if err != nil {
-		log.Fatalf("failed parse components from string, %s", err)
-	}
-
-	config.PrintComponents(components)
-
-	for _, cmpnt := range components {
-		componentParser := parser.NewSwaggerComponentParser(cmpnt.Path)
-
-		err := componentParser.Parse()
-		if err != nil {
-			log.Fatalf("failed parse component, %s", err)
-		}
-
-		config.PrintComponents(components)
-
-		err = head.AppendComponent(cmpnt.Name, componentParser.Files())
-		if err != nil {
-			log.Fatalf("failed append component to head, %s", err)
-		}
-	}
-
-	file, err := os.Create(config.Output)
-	if err != nil {
-		log.Fatalf("failed create output file %s, %s", config.Output, err)
-	}
-
-	err = head.SaveTo(file)
-	if err != nil {
-		log.Fatalf("failed save head to output file %s, %s", config.Output, err)
+	switch command {
+	case CommandGlue:
+		glue.Exec()
+	case CommandSolv:
+		solv.Exec()
+	default:
+		glue.Exec()
 	}
 }
