@@ -24,6 +24,7 @@ func (c *NamedContainer) Test(t *testing.T) {
 		if tester == nil {
 			continue
 		}
+
 		t.Run(tester.Name(), tester.Test)
 	}
 }

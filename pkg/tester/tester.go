@@ -19,6 +19,7 @@ func (tt *Container) Test(t *testing.T) {
 		if tester == nil {
 			continue
 		}
+
 		tester.Test(t)
 	}
 }
