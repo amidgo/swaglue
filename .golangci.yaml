@@ -17,7 +17,6 @@ linters:
     - errchkjson
     - errname
     - errorlint
-    - execinquery
     - exportloopref
     - forbidigo
     - forcetypeassert
@@ -33,12 +32,12 @@ linters:
     - gocyclo
     - godot
     - godox
-    - goerr113
+    - err113
     - gofmt
     - gofumpt
     - goheader
     - goimports
-    - gomnd
+    - mnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
@@ -96,3 +95,6 @@ linters:
     - wrapcheck
     - wsl
     - zerologlint
+issues:
+  exclude-files:
+    - main.go

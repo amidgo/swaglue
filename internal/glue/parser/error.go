@@ -1,15 +1,11 @@
 package parser
 
-import (
-	"fmt"
-)
-
 type ReadFileError struct {
 	FilePath string
 }
 
 func (e *ReadFileError) Error() string {
-	return fmt.Sprintf("read file: %s", e.FilePath)
+	return "read file: " + e.FilePath
 }
 
 func (e *ReadFileError) Is(target error) bool {
@@ -26,7 +22,7 @@ type ReadDirectoryError struct {
 }
 
 func (e *ReadDirectoryError) Error() string {
-	return fmt.Sprintf("read directory: %s", e.DirectoryPath)
+	return "read directory: " + e.DirectoryPath
 }
 
 func (e *ReadDirectoryError) Is(target error) bool {

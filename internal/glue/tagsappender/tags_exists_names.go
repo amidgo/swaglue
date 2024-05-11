@@ -6,9 +6,7 @@ import (
 	"github.com/amidgo/node"
 )
 
-var (
-	ErrExtractTagNodeName = errors.New("extract tag node name")
-)
+var ErrExtractTagNodeName = errors.New("extract tag node name")
 
 type TagsExistsNames struct {
 	names map[string]struct{}

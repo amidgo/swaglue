@@ -22,35 +22,36 @@ import (
 
 const PathsPrefix = "#/paths/"
 
+//nolint:funlen // it is an entrypoint function
 func Exec() {
 	config := parseGlueConfigFromFlags()
 
 	fileFormat := config.fileFormat()
 	decoder := config.decoder()
 	encoder := config.encoder()
+	logger := config.logger()
+
+	gluerContainer := gluer.NewContainer()
 
 	head, err := head.ParseHeadFromFile(config.HeadFile, decoder)
 	if err != nil {
 		log.Fatalf("failed parse head from file, %s", err)
 	}
 
-	gluerLogger := config.logger()
-
-	gluerContainer := gluer.NewContainer()
-
 	if config.Paths != "" {
-		pathsGluer := gluer.NewPathsGluer(
-			gluerLogger,
-			parser.NewSwaggerPathsParser(config.Paths, PathsPrefix, fileFormat),
-			pathssetter.New(head, decoder),
+		gluerContainer.AddGluer(
+			gluer.NewPathsGluer(
+				logger,
+				parser.NewSwaggerPathsParser(config.Paths, PathsPrefix, fileFormat),
+				pathssetter.New(head, decoder),
+			),
 		)
-		gluerContainer.AddGluer(pathsGluer)
 	}
 
 	if config.Routes != "" {
 		gluerContainer.AddGluer(
 			gluer.NewRoutesGluer(
-				gluerLogger,
+				logger,
 				parser.NewRouteParser(config.Routes),
 				routesappender.New(head, decoder),
 			),
@@ -60,7 +61,7 @@ func Exec() {
 	if config.Tags != "" {
 		gluerContainer.AddGluer(
 			gluer.NewTagsGluer(
-				gluerLogger,
+				logger,
 				parser.NewSwaggerComponentParser(config.Tags, fileFormat),
 				tagsappender.New(head, decoder),
 			),
@@ -76,7 +77,7 @@ func Exec() {
 		gluerContainer.AddGluer(
 			gluer.NewComponentsGluer(
 				cmpt.Name,
-				gluerLogger,
+				logger,
 				parser.NewSwaggerComponentParser(cmpt.Path, fileFormat),
 				componentsappender.New(head, decoder),
 			),
