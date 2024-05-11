@@ -11,11 +11,11 @@ import (
 func Test_DetectFileFormat(t *testing.T) {
 	tester.RunNamedTesters(t,
 		DetectFileFormatCase{
-			Format:               fileformats.JSONFileFormat,
+			Format:               fileformats.JSONFormat,
 			ExpectFileExtensions: []string{".json"},
 		},
 		DetectFileFormatCase{
-			Format:               fileformats.YamlFileFormat,
+			Format:               fileformats.YAMLFormat,
 			ExpectFileExtensions: []string{".yaml", ".yml"},
 		},
 		DetectFileFormatCase{

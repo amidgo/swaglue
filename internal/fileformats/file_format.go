@@ -3,8 +3,8 @@ package fileformats
 import "errors"
 
 const (
-	YamlFileFormat = "yaml"
-	JSONFileFormat = "json"
+	YAMLFormat = "yaml"
+	JSONFormat = "json"
 )
 
 var ErrDetectFileFormat = errors.New("detect file format")
@@ -31,9 +31,9 @@ func JSON() *SliceFileFormat {
 
 func Detect(format string) (*SliceFileFormat, error) {
 	switch format {
-	case YamlFileFormat:
+	case YAMLFormat:
 		return YAML(), nil
-	case JSONFileFormat:
+	case JSONFormat:
 		return JSON(), nil
 	}
 

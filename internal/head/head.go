@@ -11,7 +11,7 @@ import (
 
 var ErrDecodeFile = errors.New("decode file to .yaml")
 
-const DefaultYamlIndent = 2
+const DefaultIndent = 2
 
 type FieldNotFoundError struct {
 	Field string

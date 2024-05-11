@@ -1,5 +1,7 @@
 github.com/amidgo/node v0.0.3 h1:/IMwrR1ELtjI1/jewD2m53udkGzYj6S5RwnIoXr7n9w=
 github.com/amidgo/node v0.0.3/go.mod h1:j5ule8LsdsPiAjb/JBy4hXbb6PL/62umGeDMaOFBwLU=
+github.com/amidgo/node v0.0.4 h1:qth8459jwpiUa1VyaEWUj5DT0mW0sFFmgMySWv+DOcE=
+github.com/amidgo/node v0.0.4/go.mod h1:j5ule8LsdsPiAjb/JBy4hXbb6PL/62umGeDMaOFBwLU=
 github.com/amidgo/tester v0.0.5 h1:tklSrakghlVtJVkyz5gc5tXzoi9fsDnFA1OHIWcJpGs=
 github.com/amidgo/tester v0.0.5/go.mod h1:u0D7i1Y9Vp2KugELj1znrMXBxVJDgxBDR3Ymej/sbKk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

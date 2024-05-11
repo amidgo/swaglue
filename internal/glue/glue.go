@@ -91,7 +91,7 @@ func Exec() {
 
 type glueConfig struct {
 	HeadFile, ComponentsData, Paths, Routes, Tags, TargetFileFormat, Output string
-	YamlIndent                                                              int
+	Indent                                                                  int
 	Debug                                                                   bool
 }
 
@@ -109,8 +109,8 @@ func parseGlueConfigFromFlags() glueConfig {
 	flag.StringVar(&cnf.Routes, "routes", "", "path to routes directory")
 	flag.StringVar(&cnf.Tags, "tags", "", "path to tags directory")
 	flag.StringVar(&cnf.Output, "output", "", "output file")
-	flag.StringVar(&cnf.TargetFileFormat, "format", fileformats.YamlFileFormat, "scan file formats")
-	flag.IntVar(&cnf.YamlIndent, "yamlindent", head.DefaultYamlIndent, "yaml indent")
+	flag.StringVar(&cnf.TargetFileFormat, "format", fileformats.YAMLFormat, "scan file formats")
+	flag.IntVar(&cnf.Indent, "indent", head.DefaultIndent, "encoder indent spaces")
 	flag.BoolVar(&cnf.Debug, "debug", false, "use for debug logging")
 
 	flag.Parse()
@@ -140,9 +140,9 @@ func (cnf *glueConfig) logger() logger.Logger {
 
 func (cnf *glueConfig) decoder() node.DecoderFrom {
 	switch cnf.TargetFileFormat {
-	case fileformats.JSONFileFormat:
+	case fileformats.JSONFormat:
 		return &json.Decoder{}
-	case fileformats.YamlFileFormat:
+	case fileformats.YAMLFormat:
 		return &yaml.Decoder{}
 	default:
 		log.Fatalf("unsupported fileformat, %s", cnf.TargetFileFormat)
@@ -153,10 +153,10 @@ func (cnf *glueConfig) decoder() node.DecoderFrom {
 
 func (cnf *glueConfig) encoder() node.EncoderTo {
 	switch cnf.TargetFileFormat {
-	case fileformats.JSONFileFormat:
-		return &json.Encoder{}
-	case fileformats.YamlFileFormat:
-		return &yaml.Encoder{Indent: cnf.YamlIndent}
+	case fileformats.JSONFormat:
+		return &json.Encoder{Indent: cnf.Indent}
+	case fileformats.YAMLFormat:
+		return &yaml.Encoder{Indent: cnf.Indent}
 	default:
 		log.Fatalf("unsupported fileformat, %s", cnf.TargetFileFormat)
 	}
