@@ -4,35 +4,25 @@ import (
 	"testing"
 
 	"github.com/amidgo/swaglue/internal/fileformats"
-	"github.com/amidgo/swaglue/pkg/tester"
+	"github.com/amidgo/tester"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_DetectFileFormat(t *testing.T) {
-	var tester tester.NamedContainer
-
-	tester.AddNamedTester(
+	tester.RunNamedTesters(t,
 		DetectFileFormatCase{
 			Format:               fileformats.JSONFileFormat,
 			ExpectFileExtensions: []string{".json"},
 		},
-	)
-
-	tester.AddNamedTester(
 		DetectFileFormatCase{
 			Format:               fileformats.YamlFileFormat,
 			ExpectFileExtensions: []string{".yaml", ".yml"},
 		},
-	)
-
-	tester.AddNamedTester(
 		DetectFileFormatCase{
 			Format:    "abracadabra",
 			ExpectErr: fileformats.ErrDetectFileFormat,
 		},
 	)
-
-	tester.Test(t)
 }
 
 type DetectFileFormatCase struct {

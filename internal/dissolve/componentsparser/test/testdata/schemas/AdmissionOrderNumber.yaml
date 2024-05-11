@@ -1,0 +1,3 @@
+maxLength: 60
+type: string
+example: 01-01-02

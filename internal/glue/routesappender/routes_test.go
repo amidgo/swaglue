@@ -72,6 +72,15 @@ func routes() []*model.Route {
 			},
 		},
 		{
+			Name: "/group/all",
+			Methods: []*model.RouteMethod{
+				{
+					Method:  "get",
+					Content: bytes.NewReader(groupAllGet),
+				},
+			},
+		},
+		{
 			Name: "/user/{id}",
 			Methods: []*model.RouteMethod{
 				{
@@ -96,9 +105,7 @@ func TestAppendRoutes_EmptyPaths(t *testing.T) {
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
 	require.NoError(t, err, "save file")
 
-	t.Log(buf.String())
-
-	assert.Equal(t, string(expectedEmptyPaths), buf.String())
+	assert.Equal(t, expectedEmptyPaths, buf.Bytes())
 }
 
 func TestAppendRoutes_ExistsPaths(t *testing.T) {

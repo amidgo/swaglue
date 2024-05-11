@@ -1,0 +1,7 @@
+type: object
+properties:
+  id:
+    $ref: "#/components/schemas/ID32"
+  date:
+    type: string
+    format: date

@@ -6,6 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/amidgo/node v0.0.3
+	github.com/amidgo/tester v0.0.5
 	github.com/stretchr/testify v1.8.4
 )
 

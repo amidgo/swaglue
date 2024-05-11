@@ -64,19 +64,11 @@ func (m *RouteExistsMethods) ScanNode(nd node.Node) error {
 	m.routeMethods = make(map[string]PathMethods, expectRoutesCount)
 	m.routeContentNodes = make(map[string]node.Node, expectRoutesCount)
 
-	for i, route := range nd.Content() {
-		if i == len(nd.Content())-1 {
-			return nil
-		}
+	iterator := node.MakeMapNodeIterator(nd.Content())
 
-		if route.Kind() != node.String {
-			continue
-		}
-
-		err := m.ScanRoute(nd.Content()[i], nd.Content()[i+1])
-		if err != nil {
-			return fmt.Errorf("scan route methods, %w", err)
-		}
+	for iterator.HasNext() {
+		key, content := iterator.Next()
+		m.ScanRoute(key, content)
 	}
 
 	return nil
@@ -109,20 +101,14 @@ func (m *RouteExistsMethods) ScanRoute(routeNameNode, routeContentNode node.Node
 }
 
 func (m *RouteExistsMethods) scanRouteMethods(routeName string, routeContentNode node.Node) error {
-	for i, method := range routeContentNode.Content() {
-		if i == len(routeContentNode.Content())-1 {
-			return nil
-		}
-
-		if method.Kind() != node.String {
-			continue
-		}
-
-		if !httpmethod.Valid(method.Value()) {
+	iterator := node.MakeMapNodeIterator(routeContentNode.Content())
+	for iterator.HasNext() {
+		key, _ := iterator.Next()
+		if !httpmethod.Valid(key.Value()) {
 			return httpmethod.ErrInvalidMethod
 		}
 
-		m.addRouteMethod(routeName, method.Value())
+		m.addRouteMethod(routeName, key.Value())
 	}
 
 	return nil

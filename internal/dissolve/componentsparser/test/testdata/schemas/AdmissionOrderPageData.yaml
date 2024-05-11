@@ -1,0 +1,12 @@
+type: object
+properties:
+  pages:
+    type: integer
+    format: int32
+  elements:
+    type: integer
+    format: int32
+  content:
+    type: array
+    items:
+      $ref: "#/components/schemas/AdmissionOrder"

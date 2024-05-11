@@ -1,0 +1,19 @@
+type: object
+properties:
+  id:
+    $ref: "#/components/schemas/ID32"
+  name:
+    $ref: "#/components/schemas/CurriculumName"
+  groups:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/ID32"
+        name:
+          $ref: "#/components/schemas/GroupName"
+  semesters:
+    type: array
+    items:
+      $ref: "#/components/schemas/CurriculumSemesterDisciplines"

@@ -1,0 +1,1473 @@
+openapi: 3.0.0
+info:
+  title: ESUS API
+  description: esus
+  termsOfService: http://swagger.io/terms/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: POFIG NA DESCRIPTION
+  url: http://swagger.io
+servers:
+  - url: http://localhost:10024/api/v1
+tags:
+  - name: education-periods
+    description: Управление учебными периодами
+  - name: admission-orders
+    description: Управление приказами о зачислении
+  - name: educational-departments
+    description: Управление учебными отделениями
+  - name: teachers
+    description: Управление преподавателями
+  - name: teacher
+    description: Запросы для конкретного преподавателя
+  - name: curriculums
+    description: Управление учебными планами
+  - name: curriculum-disciplines
+    description: Управление дисциплинами учебного плана
+  - name: disciplines
+    description: Управление всеми учебными дисциплинами
+  - name: groups
+    description: Управление учебными группами
+  - name: users
+    description: Управление пользователями
+  - name: student_grades
+    description: Управление оценками студент(а|ов)
+  - name: login
+    description: Запросы Авторизации
+  - name: college-managers
+    description: Запросы для учебной части
+  - name: department-heads
+    description: Запросы для управляющего отделением
+  - name: students
+    description: Запросы для управления студентами
+  - name: attendance
+    description: Посещаемость
+paths:
+  /login:
+    post:
+      tags:
+        - login
+      summary: Authorization by Login And Password
+      requestBody:
+        required: true
+        description: "login and password"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        200:
+          description: On Successfull Authorization Set Cookie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginPasswordResponse"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session_id=<UUID>; HttpOnly; Secure
+        400:
+          description: "wrong password or user with login not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /login/vk:
+    post:
+      tags:
+        - login
+      summary: Login with VK Launch Params
+      responses:
+        200:
+          description: return JWT Access Token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JwtLoginResponse"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /education-periods:
+    get:
+      tags:
+        - education-periods
+      summary: get all education periods
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Limit"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EducationPeriodPageData"
+    post:
+      tags:
+        - education-periods
+      summary: Добавить новый период обучения
+      operationId: addEducationPeriod
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EducationPeriodData"
+        required: true
+      responses:
+        201:
+          description: successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ID32"
+        400:
+          description: failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /education-periods/search:
+    get:
+      tags:
+        - education-periods
+      summary: Get education period by start_date and end_date
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            $ref: "#/components/schemas/EducationPeriodStartDate"
+        - name: end_date
+          in: query
+          schema:
+            $ref: "#/components/schemas/EducationPeriodEndDate"
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/SearchLimit"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EducationPeriodPageData"
+  /education-periods/{id}:
+    delete:
+      tags:
+        - education-periods
+      summary: Delete education periods by id
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        204:
+          description: deleted
+          content: {}
+        400:
+          description: failed update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admission-orders:
+    get:
+      tags:
+        - admission-orders
+      summary: Get AdmissionOrders with offset and limit
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Limit"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdmissionOrderPageData"
+    post:
+      tags:
+        - admission-orders
+      summary: Create AdmissionOrder
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdmissionOrderData"
+        required: true
+      responses:
+        201:
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ID32"
+        400:
+          description: failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /admission-orders/search:
+    get:
+      tags:
+        - admission-orders
+      summary: Search AdmissionOrder by number
+      parameters:
+        - name: number
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/AdmissionOrderNumber"
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/SearchLimit"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdmissionOrderPageData"
+  /admission-orders/{id}:
+    put:
+      tags:
+        - admission-orders
+      summary: Update AdmissionOrder
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdmissionOrderData"
+        required: true
+      responses:
+        204:
+          description: No Content
+          content: {}
+        400:
+          description: failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+        - admission-orders
+      summary: Delete AdmissionOrder by id
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        204:
+          description: No Content
+          content: {}
+        400:
+          description: failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /educational-departments:
+    get:
+      tags:
+        - educational-departments
+      summary: Get All Educational Departments
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/EducationalDepartment"
+  /educational-departments/{id}:
+    get:
+      tags:
+        - educational-departments
+      summary: Get Eduactional Department By Id
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EducationalDepartment"
+        400:
+          description: failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /teachers:
+    get:
+      tags:
+        - teachers
+      summary: Get All users who are teachers with pagination
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Limit"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPageData"
+    post:
+      tags:
+        - teachers
+      summary: Create Teacher
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUser"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ID32"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /teachers/{id}:
+    get:
+      tags:
+        - teachers
+      summary: Get Teacher With ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherData"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /teachers/search:
+    get:
+      tags:
+        - teachers
+      summary: Search Teacher By FIO
+      parameters:
+        - name: fio
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/SearchLimit"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPageData"
+  /teacher/disciplines:
+    get:
+      tags:
+        - teacher
+      summary: Get Teacher Study Disciplines
+      security:
+        - bearerTokenAuth: []
+      parameters:
+        - in: query
+          name: period
+          required: true
+          description: Текущий означает дисциплины по текущему семестру у групп, за всё время это за всё время вообще, была у тебя на 1 курсе история, сейчас ты на 4 курсе, у препода высветится твоя группа только если он выберет за всё время
+          schema:
+            type: string
+            enum: [current, all_time]
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherStudyDisciplines"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /users/{id}:
+    delete:
+      tags:
+        - users
+      summary: Delete User By ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+        - users
+      summary: Change User FIO
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserFIO"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /users/info:
+    get:
+      tags:
+        - users
+      security:
+        - bearerTokenAuth: []
+        - cookieAuth: []
+      summary: user personal info
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /users/{id}/set-vk:
+    patch:
+      tags:
+        - users
+      summary: Set User VK_ID
+      security:
+        - cookieAuth: []
+        - bearerTokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+        - name: vk_url
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/VKURL"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /curriculums/{id}:
+    get:
+      tags:
+        - curriculums
+      summary: Get Curriculum By ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Curriculum"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - curriculums
+      summary: Delete Curriculum by ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /curriculums/{id}/change-name:
+    patch:
+      tags:
+        - curriculums
+      summary: Change CurriculumName
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+        - name: name
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/CurriculumName"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /curriculums:
+    post:
+      tags:
+        - curriculums
+      summary: Create Curriculum
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurriculumCreateModel"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Curriculum"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /curriculums/search:
+    get:
+      tags:
+        - curriculums
+      summary: Search Curriculums by id
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Limit"
+        - name: curriculum_name
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/CurriculumName"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurriculumSearch"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /curriculum-disciplines:
+    post:
+      tags:
+        - curriculum-disciplines
+      security:
+        - cookieAuth: []
+      summary: Change discipline to curriculum semester
+      description: table curriculum_disciplines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCurriculumDiscipline"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurriculumDiscipline"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /curriculum-disciplines/{curriculum_discipline_id}:
+    delete:
+      tags:
+        - curriculum-disciplines
+      summary: Remove discipline from semester of curriculum
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: curriculum_discipline_id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+        - curriculum-disciplines
+      security:
+        - cookieAuth: []
+      summary: Update curriculum discipline by id
+      parameters:
+        - name: curriculum_discipline_id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurriculumDisciplineData"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /disciplines/search:
+    get:
+      tags:
+        - disciplines
+      summary: Search from all disciplines by name
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Offset"
+        - name: limit
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/SearchLimit"
+        - name: name
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DisciplineName"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DisciplinePageData"
+  /groups:
+    post:
+      tags:
+        - groups
+      summary: Create Group
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupData"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /groups/{id}:
+    get:
+      tags:
+        - groups
+      summary: Get Group Data
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+        - groups
+      summary: Update Group By ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupData"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+        - groups
+      summary: Delete Group By ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /groups/{id}/set-discipline-teacher:
+    post:
+      tags:
+        - groups
+      summary: Set Teacher in teacher_disciplines table
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+        - name: curriculum_discipline_id
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+        - name: teacher_id
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /groups/{id}/grades:
+    get:
+      tags:
+        - groups
+      summary: Get Group Grades
+      description: Возращаемые оценки отсортированы по 1. Фамилии 2. Имени 3. Отчеству (как в журнале)
+      security:
+        - bearerTokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+        - name: curriculum_discipline_id
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupGrades"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /college-managers:
+    post:
+      tags:
+        - college-managers
+      summary: Register College Manager
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserLoginPassword"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ID32"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /department-heads:
+    post:
+      tags:
+        - department-heads
+      summary: Register Department Head with out department
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDepartmentHead"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ID32"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /students/{id}/set-grade:
+    put:
+      tags:
+        - student_grades
+      security:
+        - bearerTokenAuth: []
+      description: Проверка на ведёт ли он эту дисциплину у группы этого студента
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+        - name: curriculum_discipline_id
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+        - name: grade
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Grade"
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /attendance/student-personal:
+    get:
+      tags:
+        - attendance
+      security:
+        - bearerTokenAuth: []
+      description: Должны быть отсортированы по возрастанию
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: true
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: true
+      summary: student personal attendance
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodAttendance"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /attendance/group:
+    get:
+      tags:
+        - attendance
+      security:
+        - bearerTokenAuth: []
+      description: Посещаемость целой группы, эту штуку только староста может смотреть, и инфа приходит по группе в которой он состоит
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: true
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: true
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupAttendance"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+        - attendance
+      security:
+        - bearerTokenAuth: []
+      description: Создание отчёта за день, дата будет сегодняшняя, группа берётся от старосты
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceReport"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /attendance/group/{id}:
+    get:
+      tags:
+        - attendance
+      security:
+        - bearerTokenAuth: []
+      description: Посещаемость конкретной группы, только для кураторов, нужно проверить принадлежит ли эта группа куратору
+      parameters:
+        - name: id
+          in: path
+          schema:
+            $ref: "#/components/schemas/ID32"
+          required: true
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: true
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+          required: true
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupAttendance"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /attendance/{id}/rows:
+    get:
+      tags:
+        - attendance
+      security:
+        - bearerTokenAuth: []
+      description: Посещаемость группы за конкретный день, если у нас есть роль куратора (authUserRoles) проверить его ли это группы, если это староста то проверить является ли он старостой группы
+      parameters:
+        - name: id
+          in: path
+          schema:
+            $ref: "#/components/schemas/ID32"
+          required: true
+          description: Это если что айдишник отчета а не группы
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentAttendanceRowList"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+        - attendance
+      security:
+        - bearerTokenAuth: []
+      description: добавить студента в отчет, студента можно добавить только в течение текущего дня, добавить может только староста этой группы, добавить студента можно только из группы которая указана в отчете, из запроса необходимо вернуть текущий список студентов
+      parameters:
+        - name: id
+          in: path
+          schema:
+            $ref: "#/components/schemas/ID32"
+          required: true
+          description: Это если что айдишник отчета а не группы
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentAttendanceRow"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentAttendanceRowList"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /group/{id}/students:
+    get:
+      tags:
+        - students
+      summary: get group students
+      security:
+        - bearerTokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+      description: Все пользователи отсортированы по алфавиту, повторений в students и leaders быть не должно, староста не студент, получить может как староста так и классный руководитель с соответствующими проверками принадлежности к группе
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupStudents"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /students:
+    post:
+      tags:
+        - students
+      summary: Create Student
+      security:
+        - bearerTokenAuth: []
+      description: может сделать только куратор, проверка на принадлежность группе
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterStudent"
+      responses:
+        201:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /students/{id}:
+    put:
+      tags:
+        - students
+      summary: Create Student
+      security:
+        - bearerTokenAuth: []
+      description: может сделать только куратор, проверка на принадлежность этого студента к группе
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: айдишник студента
+          schema:
+            $ref: "#/components/schemas/ID32"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStudent"
+      responses:
+        201:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /students/{id}/set-leader:
+    put:
+      tags:
+        - students
+      summary: make student leader
+      security:
+        - bearerTokenAuth: []
+      description: может сделать только куратор, проверка на принадлежность группе, группа берётся текущая в которой состоит студент
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID32"
+          description: айдишник студента
+      responses:
+        204:
+          description: ""
+          content: {}
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-codegen-request-body-name: body
+  /curator/groups:
+    get:
+      tags:
+        - groups
+      summary: Get Group Data for Curator
+      security:
+        - bearerTokenAuth: []
+      description: Группы куратора
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CuratorGroup"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /student/grades:
+    get:
+      tags:
+        - student_grades
+      summary: get students grades
+      security:
+        - bearerTokenAuth: []
+      description: Получение оценок студента, студент берётся из авторизации, семестры отсортированы по возрастанию
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonalStudentGrades"
+        400:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /vk/map-id:
+    post:
+      tags:
+        - vk
+      security:
+        - bearerTokenAuth: []
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ID32"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ID32"
+components:

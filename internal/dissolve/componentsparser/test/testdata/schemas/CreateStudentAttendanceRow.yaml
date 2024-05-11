@@ -1,0 +1,9 @@
+type: object
+properties:
+  student_id:
+    $ref: "#/components/schemas/ID32"
+  mark:
+    $ref: "#/components/schemas/AttendanceReportMark"
+  hour_amount:
+    type: integer
+    description: Количество прогулов в этот день, не может быть равно нулю, т.к. если нет пометки то и эту штуку он не увиди
