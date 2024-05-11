@@ -138,7 +138,7 @@ func (cnf *glueConfig) logger() logger.Logger {
 	return &logger.SlogWrapper{Logger: slog.New(handler)}
 }
 
-func (cnf *glueConfig) decoder() node.Decoder {
+func (cnf *glueConfig) decoder() node.DecoderFrom {
 	switch cnf.TargetFileFormat {
 	case fileformats.JSONFileFormat:
 		return &json.Decoder{}
@@ -151,7 +151,7 @@ func (cnf *glueConfig) decoder() node.Decoder {
 	return nil
 }
 
-func (cnf *glueConfig) encoder() node.Encoder {
+func (cnf *glueConfig) encoder() node.EncoderTo {
 	switch cnf.TargetFileFormat {
 	case fileformats.JSONFileFormat:
 		return &json.Encoder{}
@@ -171,7 +171,7 @@ func glue(gluerContainer gluer.Gluer) {
 	}
 }
 
-func save(head *head.Head, output string, encoder node.Encoder) {
+func save(head *head.Head, output string, encoder node.EncoderTo) {
 	file, err := os.Create(output)
 	if err != nil {
 		log.Fatalf("create output file %s, %s", output, err)

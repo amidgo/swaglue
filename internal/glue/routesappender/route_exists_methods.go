@@ -5,13 +5,12 @@ import (
 	"fmt"
 
 	"github.com/amidgo/node"
-	"github.com/amidgo/swaglue/internal/head"
 	"github.com/amidgo/swaglue/internal/model"
 	"github.com/amidgo/swaglue/pkg/httpmethod"
 )
 
 type RouteExistsMethods struct {
-	decoder           node.Decoder
+	decoder           node.DecoderFrom
 	routeMethods      map[string]PathMethods
 	routeContentNodes map[string]node.Node
 }
@@ -151,13 +150,13 @@ func (p PathMethods) addMethod(method string) {
 
 type RouteContentNode struct {
 	node.Node
-	Decoder node.Decoder
+	Decoder node.DecoderFrom
 }
 
 func (n *RouteContentNode) AddMethod(method *model.RouteMethod) error {
 	methodNameNode := node.MakeStringNode(method.Method)
 
-	methodContentNode, err := head.DecodeNodeFrom(method.Content, n.Decoder)
+	methodContentNode, err := n.Decoder.DecodeFrom(method.Content)
 	if err != nil {
 		return fmt.Errorf("decode yaml node, %w", err)
 	}

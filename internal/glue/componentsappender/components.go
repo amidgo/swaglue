@@ -15,10 +15,10 @@ var ErrNoComponentsTag = errors.New("'components' tag not found")
 
 type HeadComponentAppender struct {
 	head    *head.Head
-	decoder node.Decoder
+	decoder node.DecoderFrom
 }
 
-func New(head *head.Head, decoder node.Decoder) *HeadComponentAppender {
+func New(head *head.Head, decoder node.DecoderFrom) *HeadComponentAppender {
 	return &HeadComponentAppender{
 		head:    head,
 		decoder: decoder,
@@ -54,7 +54,7 @@ func (h *HeadComponentAppender) AppendComponent(componentName string, componentI
 }
 
 type ComponentAppender struct {
-	Decoder        node.Decoder
+	Decoder        node.DecoderFrom
 	ComponentName  string
 	ComponentItems []*model.Item
 	Node           node.Node
@@ -149,13 +149,13 @@ func (a *ComponentAppender) validateItemNode(itemNode node.Node) error {
 }
 
 type ComponentNodeBuilder struct {
-	decoder   node.Decoder
+	decoder   node.DecoderFrom
 	namedNode node.Node
 	itemsNode node.Node
 	err       error
 }
 
-func (c *ComponentNodeBuilder) SetDecoder(dec node.Decoder) *ComponentNodeBuilder {
+func (c *ComponentNodeBuilder) SetDecoder(dec node.DecoderFrom) *ComponentNodeBuilder {
 	if c.err != nil {
 		return c
 	}
@@ -220,7 +220,7 @@ func (c *ComponentNodeBuilder) appendComponents(components []*model.Item) {
 func (c *ComponentNodeBuilder) appendComponent(component *model.Item) error {
 	namedNode := node.MakeStringNode(component.Name)
 
-	itemNode, err := head.DecodeNodeFrom(component.Content, c.decoder)
+	itemNode, err := c.decoder.DecodeFrom(component.Content)
 	if err != nil {
 		return fmt.Errorf("%w, for %s, %w", head.ErrDecodeFile, component.Name, err)
 	}

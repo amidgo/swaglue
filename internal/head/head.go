@@ -25,7 +25,7 @@ type Head struct {
 	node.Node
 }
 
-func ParseHeadFromFile(filePath string, decoder node.Decoder) (*Head, error) {
+func ParseHeadFromFile(filePath string, decoder node.DecoderFrom) (*Head, error) {
 	file, err := os.OpenFile(filePath, os.O_RDONLY, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("parse head from file: open file: %w", err)
@@ -39,13 +39,8 @@ func ParseHeadFromFile(filePath string, decoder node.Decoder) (*Head, error) {
 	return head, nil
 }
 
-func ParseHead(r io.Reader, decoder node.Decoder) (*Head, error) {
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return nil, fmt.Errorf("read from source, %w", err)
-	}
-
-	node, err := decoder.Decode(data)
+func ParseHead(r io.Reader, decoder node.DecoderFrom) (*Head, error) {
+	node, err := decoder.DecodeFrom(r)
 	if err != nil {
 		return nil, fmt.Errorf("unmarshal data, %w", err)
 	}
@@ -55,7 +50,7 @@ func ParseHead(r io.Reader, decoder node.Decoder) (*Head, error) {
 	}, nil
 }
 
-func (h *Head) SaveToFile(filePath string, flag int, mode os.FileMode, encoder node.Encoder) error {
+func (h *Head) SaveToFile(filePath string, flag int, mode os.FileMode, encoder node.EncoderTo) error {
 	f, err := os.OpenFile(filePath, flag, mode)
 	if err != nil {
 		return fmt.Errorf("open file, %w", err)
@@ -69,15 +64,10 @@ func (h *Head) SaveToFile(filePath string, flag int, mode os.FileMode, encoder n
 	return nil
 }
 
-func (h *Head) SaveTo(w io.Writer, encoder node.Encoder) error {
-	data, err := encoder.Encode(h.Node)
+func (h *Head) SaveTo(w io.Writer, encoder node.EncoderTo) error {
+	err := encoder.EncodeTo(w, h.Node)
 	if err != nil {
 		return fmt.Errorf("save head to writer, %w", err)
-	}
-
-	_, err = w.Write(data)
-	if err != nil {
-		return fmt.Errorf("write to dest, %w", err)
 	}
 
 	return nil
@@ -104,20 +94,4 @@ func searchInContent(node node.Node, tag string) (int, bool) {
 	}
 
 	return 0, false
-}
-
-var ErrWrongYamlDocumentNodeFormat = errors.New("wrong yaml document node format")
-
-func DecodeNodeFrom(src io.Reader, decoder node.Decoder) (node.Node, error) {
-	data, err := io.ReadAll(src)
-	if err != nil {
-		return nil, fmt.Errorf("read, %w", err)
-	}
-
-	node, err := decoder.Decode(data)
-	if err != nil {
-		return nil, fmt.Errorf("decode, %w", err)
-	}
-
-	return node, nil
 }

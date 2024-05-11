@@ -20,10 +20,10 @@ var (
 
 type HeadPathSetter struct {
 	head    *head.Head
-	decoder node.Decoder
+	decoder node.DecoderFrom
 }
 
-func New(head *head.Head, decoder node.Decoder) *HeadPathSetter {
+func New(head *head.Head, decoder node.DecoderFrom) *HeadPathSetter {
 	return &HeadPathSetter{
 		head:    head,
 		decoder: decoder,
@@ -66,7 +66,7 @@ func validatePathNode(pathNode node.Node) error {
 
 type PathsSetter struct {
 	Node    node.Node
-	Decoder node.Decoder
+	Decoder node.DecoderFrom
 }
 
 func (p *PathsSetter) SetPathRefs(paths map[string]io.Reader) error {
@@ -94,7 +94,7 @@ func (p *PathsSetter) SetPathRefs(paths map[string]io.Reader) error {
 			return fmt.Errorf("%w, ref %s not found", ErrInvalidRef, ref)
 		}
 
-		node, err := head.DecodeNodeFrom(r, p.Decoder)
+		node, err := p.Decoder.DecodeFrom(r)
 		if err != nil {
 			return fmt.Errorf("%w, for ref %s, %w", head.ErrDecodeFile, ref, err)
 		}

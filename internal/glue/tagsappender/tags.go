@@ -14,11 +14,11 @@ const tagsTag = "tags"
 var ErrNoTagsTag = errors.New("'tags' tag not found")
 
 type HeadTagsAppender struct {
-	decoder node.Decoder
+	decoder node.DecoderFrom
 	head    *head.Head
 }
 
-func New(head *head.Head, decoder node.Decoder) *HeadTagsAppender {
+func New(head *head.Head, decoder node.DecoderFrom) *HeadTagsAppender {
 	return &HeadTagsAppender{head: head, decoder: decoder}
 }
 
@@ -57,7 +57,7 @@ func (h *HeadTagsAppender) AppendTags(tags []*model.Item) error {
 }
 
 type TagsAppender struct {
-	Decoder         node.Decoder
+	Decoder         node.DecoderFrom
 	Node            node.Node
 	TagsExistsNames TagsExistsNames
 }
@@ -73,7 +73,7 @@ func (n *TagsAppender) AppendTags(tags []*model.Item) error {
 			return fmt.Errorf("%w, tag name: %s", ErrTagNameExists, tag.Name)
 		}
 
-		node, err := head.DecodeNodeFrom(tag.Content, n.Decoder)
+		node, err := n.Decoder.DecodeFrom(tag.Content)
 		if err != nil {
 			return fmt.Errorf("decode item content, %w", err)
 		}

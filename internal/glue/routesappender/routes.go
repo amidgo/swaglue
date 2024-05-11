@@ -19,10 +19,10 @@ var (
 
 type HeadRoutesAppender struct {
 	head    *head.Head
-	decoder node.Decoder
+	decoder node.DecoderFrom
 }
 
-func New(head *head.Head, decoder node.Decoder) *HeadRoutesAppender {
+func New(head *head.Head, decoder node.DecoderFrom) *HeadRoutesAppender {
 	return &HeadRoutesAppender{
 		head:    head,
 		decoder: decoder,
