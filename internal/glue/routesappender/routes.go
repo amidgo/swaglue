@@ -3,7 +3,6 @@ package routesappender
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/amidgo/node"
 	"github.com/amidgo/swaglue/internal/head"
@@ -89,35 +88,14 @@ func (r *RouteAppender) AppendRoutes(routes []*model.Route) error {
 var ErrDetectRouteMethodsConflicts = errors.New("detect route methods conflicts")
 
 func (r *RouteAppender) appendRouteMethodsToExistsRoute(route *model.Route) error {
-	err := r.detectRouteMethodsConflits(route)
-	if err != nil {
-		return err
-	}
+	r.ExistsRouteMethods.FilterExistsMethods(route)
 
-	err = r.addRouteMethods(route)
+	err := r.addRouteMethods(route)
 	if err != nil {
 		return fmt.Errorf("append route methods, %w", err)
 	}
 
-	return nil
-}
-
-func (r *RouteAppender) detectRouteMethodsConflits(route *model.Route) error {
-	methods := make([]string, 0, len(route.Methods))
-	for _, routeMethod := range route.Methods {
-		methods = append(methods, routeMethod.Method)
-	}
-
-	if existsMethods, exists := r.ExistsRouteMethods.AnyRouteMethodExists(route.Name, methods); exists {
-		methodsString := strings.Join(existsMethods, ",")
-
-		return fmt.Errorf(
-			"%w, route %s, route methods %s already exists in head file",
-			ErrDetectRouteMethodsConflicts,
-			route.Name,
-			methodsString,
-		)
-	}
+	r.ExistsRouteMethods.AddRouteMethods(route)
 
 	return nil
 }
@@ -154,6 +132,8 @@ func (r *RouteAppender) appendRoute(route *model.Route) error {
 
 	r.AppendNode(pathNameRoute)
 	r.AppendNode(pathMethodsRoute.Node)
+
+	r.ExistsRouteMethods.ScanRoute(pathNameRoute, pathMethodsRoute.Node)
 
 	return nil
 }

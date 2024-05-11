@@ -38,6 +38,24 @@ func routes() []*model.Route {
 					Method:  "get",
 					Content: bytes.NewReader(loginVKGet),
 				},
+			},
+		},
+		{
+			Name: "/login/vk",
+			Methods: []*model.RouteMethod{
+				{
+					Method:  "post",
+					Content: bytes.NewReader(loginVKPost),
+				},
+			},
+		},
+		{
+			Name: "/login/vk",
+			Methods: []*model.RouteMethod{
+				{
+					Method:  "get",
+					Content: bytes.NewReader(loginVKGet),
+				},
 				{
 					Method:  "post",
 					Content: bytes.NewReader(loginVKPost),
@@ -77,6 +95,8 @@ func TestAppendRoutes_EmptyPaths(t *testing.T) {
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
 	require.NoError(t, err, "save file")
+
+	t.Log(buf.String())
 
 	assert.Equal(t, string(expectedEmptyPaths), buf.String())
 }

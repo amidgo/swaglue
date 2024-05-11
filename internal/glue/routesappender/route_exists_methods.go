@@ -22,24 +22,27 @@ func (m *RouteExistsMethods) RouteNameExists(routeName string) bool {
 	return ok
 }
 
-func (m *RouteExistsMethods) AnyRouteMethodExists(
-	routeName string,
-	methods []string,
-) (existsMethods []string, exists bool) {
-	pathNode, ok := m.routeMethods[routeName]
+func (m *RouteExistsMethods) FilterExistsMethods(route *model.Route) {
+	pathNode, ok := m.routeMethods[route.Name]
 	if !ok {
 		return
 	}
 
-	existsMethods = make([]string, 0)
+	notExistsMethods := make([]*model.RouteMethod, 0, len(route.Methods))
 
-	for _, m := range methods {
-		if pathNode.MethodExists(m) {
-			existsMethods = append(existsMethods, m)
+	for _, m := range route.Methods {
+		if !pathNode.MethodExists(m.Method) {
+			notExistsMethods = append(notExistsMethods, m)
 		}
 	}
 
-	return existsMethods, len(existsMethods) != 0
+	route.Methods = notExistsMethods
+}
+
+func (m *RouteExistsMethods) AddRouteMethods(route *model.Route) {
+	for _, method := range route.Methods {
+		m.addRouteMethod(route.Name, method.Method)
+	}
 }
 
 var ErrContentNodeNotExists = errors.New("content node not exists")
@@ -70,7 +73,7 @@ func (m *RouteExistsMethods) ScanNode(nd node.Node) error {
 			continue
 		}
 
-		err := m.scanRoute(nd.Content()[i], nd.Content()[i+1])
+		err := m.ScanRoute(nd.Content()[i], nd.Content()[i+1])
 		if err != nil {
 			return fmt.Errorf("scan route methods, %w", err)
 		}
@@ -84,7 +87,7 @@ var (
 	ErrInvalidMappingNode = errors.New("invalid mapping node")
 )
 
-func (m *RouteExistsMethods) scanRoute(routeNameNode, routeContentNode node.Node) error {
+func (m *RouteExistsMethods) ScanRoute(routeNameNode, routeContentNode node.Node) error {
 	if routeNameNode.Kind() != node.String {
 		return ErrInvalidKeyNode
 	}
@@ -142,9 +145,10 @@ type PathMethods struct {
 
 func MakePathMethods(initialMethod string) PathMethods {
 	pathMethods := PathMethods{
-		methods: make(map[string]struct{}, 1),
+		methods: map[string]struct{}{
+			initialMethod: {},
+		},
 	}
-	pathMethods.addMethod(initialMethod)
 
 	return pathMethods
 }
