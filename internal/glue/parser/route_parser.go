@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/amidgo/swaglue/internal/glue/model"
+	"github.com/amidgo/swaglue/internal/model"
 	"github.com/amidgo/swaglue/pkg/httpmethod"
 	"github.com/amidgo/swaglue/pkg/routes"
 )
@@ -27,12 +27,12 @@ func NewRouteParser(basePackage string) *RouteParser {
 func (p *RouteParser) Parse() error {
 	entries, err := os.ReadDir(p.basePackage)
 	if err != nil {
-		return fmt.Errorf("failed read base package, err: %w", err)
+		return fmt.Errorf("read base package, err: %w", err)
 	}
 
 	err = p.handleDirEntries(entries, p.basePackage)
 	if err != nil {
-		return fmt.Errorf("failed handle base package dir entries, err: %w", err)
+		return fmt.Errorf("handle base package dir entries, err: %w", err)
 	}
 
 	return nil

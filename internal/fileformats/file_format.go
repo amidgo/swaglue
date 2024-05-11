@@ -7,7 +7,7 @@ const (
 	JSONFileFormat = "json"
 )
 
-var ErrFailedDetectFileFormat = errors.New("failed detect file format")
+var ErrDetectFileFormat = errors.New("detect file format")
 
 type SliceFileFormat struct {
 	extensions []string
@@ -37,5 +37,5 @@ func Detect(format string) (*SliceFileFormat, error) {
 		return JSON(), nil
 	}
 
-	return &SliceFileFormat{}, ErrFailedDetectFileFormat
+	return &SliceFileFormat{}, ErrDetectFileFormat
 }

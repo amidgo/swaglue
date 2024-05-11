@@ -1,29 +1,39 @@
 package parser
 
-import "fmt"
+import (
+	"fmt"
+)
 
-type FailedReadFileError struct {
+type ReadFileError struct {
 	FilePath string
-	Err      error
 }
 
-func (e *FailedReadFileError) Error() string {
-	return fmt.Sprintf("failed read file: %s, err: %s", e.FilePath, e.Err)
+func (e *ReadFileError) Error() string {
+	return fmt.Sprintf("read file: %s", e.FilePath)
 }
 
-func (e *FailedReadFileError) Unwrap() error {
-	return e.Err
+func (e *ReadFileError) Is(target error) bool {
+	dirErr, ok := target.(*ReadFileError)
+	if ok {
+		return e.FilePath == dirErr.FilePath
+	}
+
+	return false
 }
 
-type FailedReadDirectoryError struct {
+type ReadDirectoryError struct {
 	DirectoryPath string
-	Err           error
 }
 
-func (e *FailedReadDirectoryError) Error() string {
-	return fmt.Sprintf("failed read directory: %s, err: %s", e.DirectoryPath, e.Err)
+func (e *ReadDirectoryError) Error() string {
+	return fmt.Sprintf("read directory: %s", e.DirectoryPath)
 }
 
-func (e *FailedReadDirectoryError) Unwrap() error {
-	return e.Err
+func (e *ReadDirectoryError) Is(target error) bool {
+	dirErr, ok := target.(*ReadDirectoryError)
+	if ok {
+		return e.DirectoryPath == dirErr.DirectoryPath
+	}
+
+	return false
 }

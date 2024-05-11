@@ -1,7 +1,6 @@
 package fileformats_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/amidgo/swaglue/internal/fileformats"
@@ -29,7 +28,7 @@ func Test_DetectFileFormat(t *testing.T) {
 	tester.AddNamedTester(
 		DetectFileFormatCase{
 			Format:    "abracadabra",
-			ExpectErr: fileformats.ErrFailedDetectFileFormat,
+			ExpectErr: fileformats.ErrDetectFileFormat,
 		},
 	)
 
@@ -43,7 +42,7 @@ type DetectFileFormatCase struct {
 }
 
 func (c DetectFileFormatCase) Name() string {
-	return fmt.Sprintf("detect file format %s", c.Format)
+	return "detect file format " + c.Format
 }
 
 func (c DetectFileFormatCase) Test(t *testing.T) {

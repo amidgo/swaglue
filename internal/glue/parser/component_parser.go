@@ -5,25 +5,26 @@ import (
 	"path"
 	"strings"
 
-	"github.com/amidgo/swaglue/internal/glue/model"
+	"github.com/amidgo/swaglue/internal/model"
 )
 
-type SwaggerComponentParser struct {
+type ComponentParser struct {
 	*swaggerComponentFileHandler
 	*fileParser
 }
 
-func NewSwaggerComponentParser(basePackage string, targetFileFormat FileFormat) *SwaggerComponentParser {
+func NewSwaggerComponentParser(basePackage string, targetFileFormat FileFormat) *ComponentParser {
 	swaggerComponentFileHandler := &swaggerComponentFileHandler{
 		files: make([]*model.Item, 0),
 	}
+
 	parser := &fileParser{
 		basePackage:      basePackage,
 		fileHandler:      swaggerComponentFileHandler,
 		targetFileFormat: targetFileFormat,
 	}
 
-	return &SwaggerComponentParser{
+	return &ComponentParser{
 		swaggerComponentFileHandler: swaggerComponentFileHandler,
 		fileParser:                  parser,
 	}
@@ -39,6 +40,9 @@ func (s *swaggerComponentFileHandler) ComponentItems() []*model.Item {
 
 func (s *swaggerComponentFileHandler) HandleFile(filePath string, file io.Reader) {
 	filePath = strings.TrimSuffix(filePath, ".yaml")
+	filePath = strings.TrimSuffix(filePath, ".yml")
+	filePath = strings.TrimSuffix(filePath, ".json")
+
 	_, fileName := path.Split(filePath)
 
 	s.files = append(s.files, &model.Item{

@@ -8,8 +8,8 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/amidgo/swaglue/internal/glue/model"
 	"github.com/amidgo/swaglue/internal/glue/parser"
+	"github.com/amidgo/swaglue/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

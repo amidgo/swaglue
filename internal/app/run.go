@@ -4,15 +4,15 @@ import (
 	"log"
 	"os"
 
+	dissolve "github.com/amidgo/swaglue/internal/dissolve"
 	"github.com/amidgo/swaglue/internal/glue"
-	"github.com/amidgo/swaglue/internal/solv"
 )
 
 const (
 	MinArgsCount = 2
 
-	CommandGlue = "glue"
-	CommandSolv = "solv"
+	CommandGlue     = "glue"
+	CommandDissolve = "dissolve"
 )
 
 func Run() {
@@ -27,8 +27,8 @@ func Run() {
 	switch command {
 	case CommandGlue:
 		glue.Exec()
-	case CommandSolv:
-		solv.Exec()
+	case CommandDissolve:
+		dissolve.Exec()
 	default:
 		glue.Exec()
 	}
