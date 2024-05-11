@@ -72,7 +72,7 @@ func (m *RouteExistsMethods) ScanNode(nd node.Node) error {
 
 		err := m.scanRoute(nd.Content()[i], nd.Content()[i+1])
 		if err != nil {
-			return fmt.Errorf("failed scan route methods, err: %w", err)
+			return fmt.Errorf("scan route methods, %w", err)
 		}
 	}
 
@@ -99,7 +99,7 @@ func (m *RouteExistsMethods) scanRoute(routeNameNode, routeContentNode node.Node
 
 	err := m.scanRouteMethods(routeName, routeContentNode)
 	if err != nil {
-		return fmt.Errorf("failed scan route methods, err %w", err)
+		return fmt.Errorf("scan route methods, err %w", err)
 	}
 
 	return nil
@@ -169,7 +169,7 @@ func (n *RouteContentNode) AddMethod(method *model.RouteMethod) error {
 
 	methodContentNode, err := head.DecodeNodeFrom(method.Content, n.Decoder)
 	if err != nil {
-		return fmt.Errorf("failed decode yaml node, err: %w", err)
+		return fmt.Errorf("decode yaml node, %w", err)
 	}
 
 	n.AppendNode(methodNameNode)

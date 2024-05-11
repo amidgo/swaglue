@@ -33,7 +33,7 @@ func TestRouteParser(t *testing.T) {
 	parser := parser.NewRouteParser(basePackage)
 
 	err := parser.Parse()
-	require.NoError(t, err, "failed parse routes")
+	require.NoError(t, err, "parse routes")
 
 	expectedRoutes := []*model.Route{
 		{
@@ -92,12 +92,12 @@ func RouteMethodEqual(routeMethod1, routeMethod2 *model.RouteMethod) bool {
 
 	content1, err := io.ReadAll(routeMethod1.Content)
 	if err != nil {
-		log.Fatalf("failed read routemethod1 content, err: %s", err)
+		log.Fatalf("read routemethod1 content, %s", err)
 	}
 
 	content2, err := io.ReadAll(routeMethod2.Content)
 	if err != nil {
-		log.Fatalf("failed read routemethod2 content, err: %s", err)
+		log.Fatalf("read routemethod2 content, %s", err)
 	}
 
 	return slices.Equal(content1, content2)

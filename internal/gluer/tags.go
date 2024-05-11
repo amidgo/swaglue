@@ -9,7 +9,7 @@ import (
 	"github.com/amidgo/swaglue/pkg/logger"
 )
 
-var ErrFailedGlueTags = errors.New("failed glue tags")
+var ErrFailedGlueTags = errors.New("glue tags")
 
 type TagsAppender interface {
 	AppendTags(items []*model.Item) error
@@ -36,7 +36,7 @@ func (g *TagsGluer) error(err error) error {
 func (g *TagsGluer) Glue() error {
 	err := g.parser.Parse()
 	if err != nil {
-		return g.error(fmt.Errorf("failed parse tags component items, err: %w", err))
+		return g.error(fmt.Errorf("parse tags component items, %w", err))
 	}
 
 	componentItems := g.parser.ComponentItems()
@@ -47,7 +47,7 @@ func (g *TagsGluer) Glue() error {
 
 	err = g.appender.AppendTags(componentItems)
 	if err != nil {
-		return g.error(fmt.Errorf("failed append tags, err: %w", err))
+		return g.error(fmt.Errorf("append tags, %w", err))
 	}
 
 	return nil

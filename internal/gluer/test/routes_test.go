@@ -107,7 +107,7 @@ func (rt *RoutesGluerTester) Test(t *testing.T) {
 	if rt.ExpectErr == nil {
 		require.NoError(t, actualErr)
 	} else {
-		require.ErrorIs(t, actualErr, gluer.ErrFailedGlueRoutes)
+		require.ErrorIs(t, actualErr, gluer.ErrGlueRoutes)
 		require.ErrorIs(t, actualErr, rt.ExpectErr)
 	}
 }

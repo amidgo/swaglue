@@ -73,12 +73,12 @@ func (r *RouteAppender) AppendRoutes(routes []*model.Route) error {
 		if r.ExistsRouteMethods.RouteNameExists(route.Name) {
 			err := r.appendRouteMethodsToExistsRoute(route)
 			if err != nil {
-				return fmt.Errorf("failed append route to exists routes, err: %w", err)
+				return fmt.Errorf("append route to exists routes, %w", err)
 			}
 		} else {
 			err := r.appendRoute(route)
 			if err != nil {
-				return fmt.Errorf("failed append route, err: %w", err)
+				return fmt.Errorf("append route, %w", err)
 			}
 		}
 	}
@@ -96,7 +96,7 @@ func (r *RouteAppender) appendRouteMethodsToExistsRoute(route *model.Route) erro
 
 	err = r.addRouteMethods(route)
 	if err != nil {
-		return fmt.Errorf("failed append route methods, err: %w", err)
+		return fmt.Errorf("append route methods, %w", err)
 	}
 
 	return nil
@@ -131,7 +131,7 @@ func (r *RouteAppender) addRouteMethods(route *model.Route) error {
 	for _, method := range route.Methods {
 		err := routeMethodContentNode.AddMethod(method)
 		if err != nil {
-			return fmt.Errorf("failed add method, err: %w", err)
+			return fmt.Errorf("add method, %w", err)
 		}
 	}
 
@@ -148,7 +148,7 @@ func (r *RouteAppender) appendRoute(route *model.Route) error {
 	for _, method := range route.Methods {
 		err := pathMethodsRoute.AddMethod(method)
 		if err != nil {
-			return fmt.Errorf("failed add method, err: %w", err)
+			return fmt.Errorf("add method, %w", err)
 		}
 	}
 

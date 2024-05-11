@@ -28,12 +28,12 @@ type Head struct {
 func ParseHeadFromFile(filePath string, decoder node.Decoder) (*Head, error) {
 	file, err := os.OpenFile(filePath, os.O_RDONLY, os.ModePerm)
 	if err != nil {
-		return nil, fmt.Errorf("failed parse head from file: failed open file: %w", err)
+		return nil, fmt.Errorf("parse head from file: open file: %w", err)
 	}
 
 	head, err := ParseHead(file, decoder)
 	if err != nil {
-		return nil, fmt.Errorf("failed parse head from file: failed parse head: %w", err)
+		return nil, fmt.Errorf("parse head from file: parse head: %w", err)
 	}
 
 	return head, nil
@@ -42,12 +42,12 @@ func ParseHeadFromFile(filePath string, decoder node.Decoder) (*Head, error) {
 func ParseHead(r io.Reader, decoder node.Decoder) (*Head, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
-		return nil, fmt.Errorf("failed read from source, %w", err)
+		return nil, fmt.Errorf("read from source, %w", err)
 	}
 
 	node, err := decoder.Decode(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed unmarshal data, %w", err)
+		return nil, fmt.Errorf("unmarshal data, %w", err)
 	}
 
 	return &Head{
@@ -58,12 +58,12 @@ func ParseHead(r io.Reader, decoder node.Decoder) (*Head, error) {
 func (h *Head) SaveToFile(filePath string, flag int, mode os.FileMode, encoder node.Encoder) error {
 	f, err := os.OpenFile(filePath, flag, mode)
 	if err != nil {
-		return fmt.Errorf("failed open file, %w", err)
+		return fmt.Errorf("open file, %w", err)
 	}
 
 	err = h.SaveTo(f, encoder)
 	if err != nil {
-		return fmt.Errorf("failed save head to file, %w", err)
+		return fmt.Errorf("save head to file, %w", err)
 	}
 
 	return nil
@@ -72,12 +72,12 @@ func (h *Head) SaveToFile(filePath string, flag int, mode os.FileMode, encoder n
 func (h *Head) SaveTo(w io.Writer, encoder node.Encoder) error {
 	data, err := encoder.Encode(h.Node)
 	if err != nil {
-		return fmt.Errorf("failed save head to writer, %w", err)
+		return fmt.Errorf("save head to writer, %w", err)
 	}
 
 	_, err = w.Write(data)
 	if err != nil {
-		return fmt.Errorf("failed write to dest, %w", err)
+		return fmt.Errorf("write to dest, %w", err)
 	}
 
 	return nil
@@ -111,12 +111,12 @@ var ErrWrongYamlDocumentNodeFormat = errors.New("wrong yaml document node format
 func DecodeNodeFrom(src io.Reader, decoder node.Decoder) (node.Node, error) {
 	data, err := io.ReadAll(src)
 	if err != nil {
-		return nil, fmt.Errorf("failed read, %w", err)
+		return nil, fmt.Errorf("read, %w", err)
 	}
 
 	node, err := decoder.Decode(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed decode, %w", err)
+		return nil, fmt.Errorf("decode, %w", err)
 	}
 
 	return node, nil

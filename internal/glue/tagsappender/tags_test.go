@@ -29,7 +29,7 @@ var (
 
 func Test_AppendTags_Success(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 
@@ -47,18 +47,18 @@ func Test_AppendTags_Success(t *testing.T) {
 			Content: bytes.NewReader(usersTagData),
 		},
 	})
-	require.NoError(t, err, "failed append components")
+	require.NoError(t, err, "append components")
 
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
-	require.NoError(t, err, "failed save file")
+	require.NoError(t, err, "save file")
 
 	assert.Equal(t, tagsExpectedSwagger, buf.Bytes())
 }
 
 func Test_AppendTags_EmptyTags(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/empty.swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 
@@ -76,18 +76,18 @@ func Test_AppendTags_EmptyTags(t *testing.T) {
 			Content: bytes.NewReader(usersTagData),
 		},
 	})
-	require.NoError(t, err, "failed append components")
+	require.NoError(t, err, "append components")
 
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
-	require.NoError(t, err, "failed save file")
+	require.NoError(t, err, "save file")
 
 	assert.Equal(t, emptyTagsExpectedSwagger, buf.Bytes())
 }
 
 func Test_AppendTags_Wrong_Name(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 
@@ -110,7 +110,7 @@ func Test_AppendTags_Wrong_Name(t *testing.T) {
 
 func Test_AppendTags_TagNameExists(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 

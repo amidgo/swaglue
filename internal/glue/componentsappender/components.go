@@ -47,7 +47,7 @@ func (h *HeadComponentAppender) AppendComponent(componentName string, componentI
 
 	err := appender.AppendComponent()
 	if err != nil {
-		return fmt.Errorf("failed append component, %w", err)
+		return fmt.Errorf("append component, %w", err)
 	}
 
 	return nil
@@ -222,7 +222,7 @@ func (c *ComponentNodeBuilder) appendComponent(component *model.Item) error {
 
 	itemNode, err := head.DecodeNodeFrom(component.Content, c.decoder)
 	if err != nil {
-		return fmt.Errorf("%w, for %s, err: %w", head.ErrDecodeFile, component.Name, err)
+		return fmt.Errorf("%w, for %s, %w", head.ErrDecodeFile, component.Name, err)
 	}
 
 	c.appendItems(namedNode, itemNode)

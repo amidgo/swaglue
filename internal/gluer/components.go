@@ -9,7 +9,7 @@ import (
 	"github.com/amidgo/swaglue/pkg/logger"
 )
 
-var ErrFailedGlueComponent = errors.New("failed glue component")
+var ErrGlueComponent = errors.New("glue component")
 
 type ComponentsParser interface {
 	Parse() error
@@ -42,13 +42,13 @@ func NewComponentsGluer(
 }
 
 func (g *ComponentsGluer) error(err error) error {
-	return fmt.Errorf("%w, componentName %s, %w", ErrFailedGlueComponent, g.ComponentName, err)
+	return fmt.Errorf("%w, componentName %s, %w", ErrGlueComponent, g.ComponentName, err)
 }
 
 func (g *ComponentsGluer) Glue() error {
 	err := g.parser.Parse()
 	if err != nil {
-		return g.error(fmt.Errorf("failed parse component items, err: %w", err))
+		return g.error(fmt.Errorf("parse component items, %w", err))
 	}
 
 	componentItems := g.parser.ComponentItems()
@@ -60,7 +60,7 @@ func (g *ComponentsGluer) Glue() error {
 
 	err = g.appender.AppendComponent(g.ComponentName, componentItems)
 	if err != nil {
-		return g.error(fmt.Errorf("failed append component items, err: %w", err))
+		return g.error(fmt.Errorf("append component items, %w", err))
 	}
 
 	return nil

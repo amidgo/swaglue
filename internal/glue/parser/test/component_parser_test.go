@@ -24,7 +24,7 @@ func TestSwaggerComponentParser(t *testing.T) {
 
 	parser := parser.NewSwaggerComponentParser(basePackage, fileformats.YAML())
 	err := parser.Parse()
-	require.NoError(t, err, "failed parse")
+	require.NoError(t, err, "parse")
 
 	files := parser.ComponentItems()
 	assert.Len(t, files, 2, "wrong files length")

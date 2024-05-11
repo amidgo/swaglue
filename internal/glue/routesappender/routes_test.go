@@ -67,32 +67,32 @@ func routes() []*model.Route {
 
 func TestAppendRoutes_EmptyPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/routes/routes_with_empty_paths.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open routes_with_empty_paths.yaml")
+	require.NoError(t, err, "open routes_with_empty_paths.yaml")
 
 	appender := routesappender.New(hd, new(yaml.Decoder))
 
 	err = appender.AppendRoutes(routes())
-	require.NoError(t, err, "failed append routes")
+	require.NoError(t, err, "append routes")
 
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
-	require.NoError(t, err, "failed save file")
+	require.NoError(t, err, "save file")
 
 	assert.Equal(t, string(expectedEmptyPaths), buf.String())
 }
 
 func TestAppendRoutes_ExistsPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/routes/routes_with_exists_paths.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open routes_with_exists_paths.yaml")
+	require.NoError(t, err, "open routes_with_exists_paths.yaml")
 
 	appender := routesappender.New(hd, new(yaml.Decoder))
 
 	err = appender.AppendRoutes(routes())
-	require.NoError(t, err, "failed append routes")
+	require.NoError(t, err, "append routes")
 
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
-	require.NoError(t, err, "failed save file")
+	require.NoError(t, err, "save file")
 
 	assert.Equal(t, expectedExistsPaths, buf.Bytes())
 }

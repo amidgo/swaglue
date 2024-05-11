@@ -49,7 +49,7 @@ func (h *HeadPathSetter) SetPaths(paths map[string]io.Reader) error {
 
 		err := route.SetPathRefs(paths)
 		if err != nil {
-			return fmt.Errorf("failed handle paths, err: %w", err)
+			return fmt.Errorf("handle paths, %w", err)
 		}
 	}
 
@@ -96,7 +96,7 @@ func (p *PathsSetter) SetPathRefs(paths map[string]io.Reader) error {
 
 		node, err := head.DecodeNodeFrom(r, p.Decoder)
 		if err != nil {
-			return fmt.Errorf("%w, for ref %s, err: %w", head.ErrDecodeFile, ref, err)
+			return fmt.Errorf("%w, for ref %s, %w", head.ErrDecodeFile, ref, err)
 		}
 
 		nodes[i+1] = node

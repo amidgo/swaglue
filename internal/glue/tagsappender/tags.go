@@ -39,7 +39,7 @@ func (h *HeadTagsAppender) AppendTags(tags []*model.Item) error {
 
 	err := tagsExistsNames.ScanNode(tagsNode)
 	if err != nil {
-		return fmt.Errorf("failed scan tags node, err: %w", err)
+		return fmt.Errorf("scan tags node, %w", err)
 	}
 
 	appender := TagsAppender{
@@ -50,7 +50,7 @@ func (h *HeadTagsAppender) AppendTags(tags []*model.Item) error {
 
 	err = appender.AppendTags(tags)
 	if err != nil {
-		return fmt.Errorf("failed append tags to node, %w", err)
+		return fmt.Errorf("append tags to node, %w", err)
 	}
 
 	return nil
@@ -75,12 +75,12 @@ func (n *TagsAppender) AppendTags(tags []*model.Item) error {
 
 		node, err := head.DecodeNodeFrom(tag.Content, n.Decoder)
 		if err != nil {
-			return fmt.Errorf("failed decode item content, err: %w", err)
+			return fmt.Errorf("decode item content, %w", err)
 		}
 
 		name, err := extractTagNodeName(node)
 		if err != nil {
-			return fmt.Errorf("failed extract tag node name, err: %w", err)
+			return fmt.Errorf("extract tag node name, %w", err)
 		}
 
 		if tag.Name != name {

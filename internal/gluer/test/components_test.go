@@ -114,7 +114,7 @@ func (ct *ComponentsGluerTester) Test(t *testing.T) {
 	if ct.ExpectErr == nil {
 		require.NoError(t, actualErr)
 	} else {
-		require.ErrorIs(t, actualErr, gluer.ErrFailedGlueComponent)
+		require.ErrorIs(t, actualErr, gluer.ErrGlueComponent)
 		require.ErrorIs(t, actualErr, ct.ExpectErr)
 	}
 }

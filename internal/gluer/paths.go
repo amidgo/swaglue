@@ -9,7 +9,7 @@ import (
 	"github.com/amidgo/swaglue/pkg/logger"
 )
 
-var ErrFailedGluePaths = errors.New("failed glue paths")
+var ErrGluePaths = errors.New("glue paths")
 
 type PathsParser interface {
 	Parse() error
@@ -35,13 +35,13 @@ func NewPathsGluer(log logger.DebugLogger, parser PathsParser, setter PathsSette
 }
 
 func (g *PathsGluer) error(err error) error {
-	return fmt.Errorf("%w, %w", ErrFailedGluePaths, err)
+	return fmt.Errorf("%w, %w", ErrGluePaths, err)
 }
 
 func (g *PathsGluer) Glue() error {
 	err := g.parser.Parse()
 	if err != nil {
-		return g.error(fmt.Errorf("failed parse paths, err: %w", err))
+		return g.error(fmt.Errorf("parse paths, %w", err))
 	}
 
 	paths := g.parser.Paths()
@@ -49,7 +49,7 @@ func (g *PathsGluer) Glue() error {
 
 	err = g.setter.SetPaths(paths)
 	if err != nil {
-		return g.error(fmt.Errorf("failed set paths, err: %w", err))
+		return g.error(fmt.Errorf("set paths, %w", err))
 	}
 
 	return nil

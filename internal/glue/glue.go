@@ -35,7 +35,7 @@ func Exec() {
 
 	head, err := head.ParseHeadFromFile(config.HeadFile, decoder)
 	if err != nil {
-		log.Fatalf("failed parse head from file, %s", err)
+		log.Fatalf("parse head from file, %s", err)
 	}
 
 	if config.Paths != "" {
@@ -70,7 +70,7 @@ func Exec() {
 
 	componentsData, err := parseComponentsFromString(config.ComponentsData)
 	if err != nil {
-		log.Fatalf("failed parse components, %s", err)
+		log.Fatalf("parse components, %s", err)
 	}
 
 	for _, cmpt := range componentsData {
@@ -121,7 +121,7 @@ func parseGlueConfigFromFlags() glueConfig {
 func (cnf *glueConfig) fileFormat() parser.FileFormat {
 	fileFormat, err := fileformats.Detect(cnf.TargetFileFormat)
 	if err != nil {
-		log.Fatalf("failed detect fileformat, %s", err)
+		log.Fatalf("detect fileformat, %s", err)
 	}
 
 	return fileFormat
@@ -167,18 +167,18 @@ func (cnf *glueConfig) encoder() node.Encoder {
 func glue(gluerContainer gluer.Gluer) {
 	err := gluerContainer.Glue()
 	if err != nil {
-		log.Fatalf("failed gluer container glue: %s", err)
+		log.Fatalf("gluer container glue: %s", err)
 	}
 }
 
 func save(head *head.Head, output string, encoder node.Encoder) {
 	file, err := os.Create(output)
 	if err != nil {
-		log.Fatalf("failed create output file %s, %s", output, err)
+		log.Fatalf("create output file %s, %s", output, err)
 	}
 
 	err = head.SaveTo(file, encoder)
 	if err != nil {
-		log.Fatalf("failed save head to output file %s, %s", output, err)
+		log.Fatalf("save head to output file %s, %s", output, err)
 	}
 }

@@ -28,7 +28,7 @@ var (
 
 func Test_Head_AppendComponent(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/schemas/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	appender := componentsappender.New(hd, new(yaml.Decoder))
 
@@ -42,18 +42,18 @@ func Test_Head_AppendComponent(t *testing.T) {
 			Content: bytes.NewReader(educationPeriodData),
 		},
 	})
-	require.NoError(t, err, "failed append components")
+	require.NoError(t, err, "append components")
 
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
-	require.NoError(t, err, "failed save file")
+	require.NoError(t, err, "save file")
 
 	assert.Equal(t, componentExpectedSwagger, buf.Bytes())
 }
 
 func Test_Head_AppendComponent_ExistsComponent(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/schemas/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	appender := componentsappender.New(hd, new(yaml.Decoder))
 
@@ -67,18 +67,18 @@ func Test_Head_AppendComponent_ExistsComponent(t *testing.T) {
 			Content: bytes.NewReader(educationPeriodData),
 		},
 	})
-	require.NoError(t, err, "failed append components")
+	require.NoError(t, err, "append components")
 
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
-	require.NoError(t, err, "failed save file")
+	require.NoError(t, err, "save file")
 
 	assert.Equal(t, existsComponentExpectedSwagger, buf.Bytes())
 }
 
 func Test_Head_AppendComponent_ExistsComponentItemName(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/schemas/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	appender := componentsappender.New(hd, new(yaml.Decoder))
 

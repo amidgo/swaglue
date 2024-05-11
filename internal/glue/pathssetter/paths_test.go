@@ -25,7 +25,7 @@ var (
 
 func TestPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	pathsSetter := pathssetter.New(hd, new(yaml.Decoder))
 
@@ -33,18 +33,18 @@ func TestPaths(t *testing.T) {
 		"#/paths/get":  bytes.NewReader(getPathData),
 		"#/paths/post": bytes.NewReader(postPathData),
 	})
-	require.NoError(t, err, "failed set paths")
+	require.NoError(t, err, "set paths")
 
 	buf := &bytes.Buffer{}
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
-	require.NoError(t, err, "failed save file")
+	require.NoError(t, err, "save file")
 
 	assert.Equal(t, pathsExpectedData, buf.Bytes())
 }
 
 func TestPaths_InvalidRef(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
-	require.NoError(t, err, "failed open swagger.yaml")
+	require.NoError(t, err, "open swagger.yaml")
 
 	pathsSetter := pathssetter.New(hd, new(yaml.Decoder))
 

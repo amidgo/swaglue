@@ -26,7 +26,7 @@ func (c *Container) Glue() error {
 	for _, gluer := range c.gluers {
 		err := gluer.Glue()
 		if err != nil {
-			return fmt.Errorf("failed glue, %w", err)
+			return fmt.Errorf("glue, %w", err)
 		}
 	}
 

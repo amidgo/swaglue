@@ -27,12 +27,12 @@ func NewRouteParser(basePackage string) *RouteParser {
 func (p *RouteParser) Parse() error {
 	entries, err := os.ReadDir(p.basePackage)
 	if err != nil {
-		return fmt.Errorf("read base package, err: %w", err)
+		return fmt.Errorf("read base package, %w", err)
 	}
 
 	err = p.handleDirEntries(entries, p.basePackage)
 	if err != nil {
-		return fmt.Errorf("handle base package dir entries, err: %w", err)
+		return fmt.Errorf("handle base package dir entries, %w", err)
 	}
 
 	return nil
@@ -42,7 +42,7 @@ func (p *RouteParser) handleDirEntries(entries []os.DirEntry, pathPrefix string)
 	for _, entry := range entries {
 		err := p.handleDirEntry(entry, pathPrefix)
 		if err != nil {
-			return fmt.Errorf("failed handle dir entry, err: %w", err)
+			return fmt.Errorf("handle dir entry, %w", err)
 		}
 	}
 
@@ -59,7 +59,7 @@ func (p *RouteParser) handleDirEntry(entry os.DirEntry, pathPrefix string) error
 
 		entries, err := os.ReadDir(dirPath)
 		if err != nil {
-			return fmt.Errorf("failed read dir by path %s, err: %w", dirPath, err)
+			return fmt.Errorf("read dir by path %s, %w", dirPath, err)
 		}
 
 		return p.handleDirEntries(entries, dirPath)
@@ -73,7 +73,7 @@ func (p *RouteParser) handleRouteEntry(entry os.DirEntry, pathPrefix string) err
 
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
-		return fmt.Errorf("failed read route entry %s, err: %w", dirPath, err)
+		return fmt.Errorf("read route entry %s, %w", dirPath, err)
 	}
 
 	route := &model.Route{

@@ -27,7 +27,7 @@ func TestSwaggerPathParser(t *testing.T) {
 	parser := parser.NewSwaggerPathsParser(basePackage, keyPrefix, fileformats.YAML())
 
 	err := parser.Parse()
-	require.NoError(t, err, "failed parse")
+	require.NoError(t, err, "parse")
 
 	files := parser.Paths()
 	assert.Len(t, files, 2, "wrong len")

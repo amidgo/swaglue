@@ -9,7 +9,7 @@ import (
 	"github.com/amidgo/swaglue/pkg/logger"
 )
 
-var ErrFailedGlueRoutes = errors.New("glue routes")
+var ErrGlueRoutes = errors.New("glue routes")
 
 type RoutesParser interface {
 	Parse() error
@@ -35,13 +35,13 @@ func NewRoutesGluer(log logger.DebugLogger, parser RoutesParser, appender Routes
 }
 
 func (g *RoutesGluer) error(err error) error {
-	return fmt.Errorf("%w, %w", ErrFailedGlueRoutes, err)
+	return fmt.Errorf("%w, %w", ErrGlueRoutes, err)
 }
 
 func (g *RoutesGluer) Glue() error {
 	err := g.parser.Parse()
 	if err != nil {
-		return g.error(fmt.Errorf("failed parse routes, err: %w", err))
+		return g.error(fmt.Errorf("parse routes, %w", err))
 	}
 
 	routes := g.parser.Routes()
@@ -49,7 +49,7 @@ func (g *RoutesGluer) Glue() error {
 
 	err = g.appender.AppendRoutes(routes)
 	if err != nil {
-		return g.error(fmt.Errorf("failed append routes, err: %w", err))
+		return g.error(fmt.Errorf("append routes, %w", err))
 	}
 
 	return nil

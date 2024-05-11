@@ -47,7 +47,7 @@ func (p *fileParser) parseEntries(entries []os.DirEntry, pathPrefix string) erro
 	for _, entry := range entries {
 		err := p.parseEntry(entry, pathPrefix)
 		if err != nil {
-			return fmt.Errorf("failed parse entry %s, err: %w", entry.Name(), err)
+			return fmt.Errorf("parse entry %s, %w", entry.Name(), err)
 		}
 	}
 
@@ -61,12 +61,12 @@ func (p *fileParser) parseEntry(entry os.DirEntry, pathPrefix string) error {
 	case entry.IsDir():
 		err := p.parseDirEntry(pathPrefix)
 		if err != nil {
-			return fmt.Errorf("parse dir entry, pathprefix %s, err: %w", pathPrefix, err)
+			return fmt.Errorf("parse dir entry, pathprefix %s, %w", pathPrefix, err)
 		}
 	case p.isTargetFile(entry):
 		err := p.parseFile(pathPrefix)
 		if err != nil {
-			return fmt.Errorf("parse yaml file, pathprefix %s, err: %w", pathPrefix, err)
+			return fmt.Errorf("parse yaml file, pathprefix %s, %w", pathPrefix, err)
 		}
 	}
 

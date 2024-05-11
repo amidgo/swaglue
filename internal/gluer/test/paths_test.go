@@ -94,7 +94,7 @@ func (pt *PathsGluerTester) Test(t *testing.T) {
 	if pt.ExpectErr == nil {
 		require.NoError(t, actualErr)
 	} else {
-		require.ErrorIs(t, actualErr, gluer.ErrFailedGluePaths)
+		require.ErrorIs(t, actualErr, gluer.ErrGluePaths)
 		require.ErrorIs(t, actualErr, pt.ExpectErr)
 	}
 }
