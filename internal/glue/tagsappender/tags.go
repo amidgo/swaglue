@@ -39,7 +39,7 @@ func (h *HeadTagsAppender) AppendTags(tags []model.Item) error {
 
 	tagsAppend := TagsAppend{
 		decoder:         h.decoder,
-		arrayNode:       node.MakeArrayNodeWithSlice(tagsNode.Content()),
+		arrayNode:       node.MakeArrayNodeWithContent(tagsNode.Content()...),
 		tagsExistsNames: tagsExistsNames,
 	}
 

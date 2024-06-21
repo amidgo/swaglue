@@ -35,7 +35,7 @@ func (h *HeadComponentAppender) AppendComponent(componentName string, componentI
 
 	appender := ComponentAppender{
 		Decoder:        h.decoder,
-		nd:             node.MakeMapNodeWithSlice(componentTag.Content()),
+		nd:             node.MakeMapNodeWithContent(componentTag.Content()...),
 		ComponentName:  componentName,
 		ComponentItems: componentItems,
 	}
@@ -89,12 +89,12 @@ func (a *ComponentAppender) searchComponentNode() (itemNode node.MapNode, index 
 		}
 
 		if iter.Index() != len(a.nd.Content())-1 {
-			return node.MakeMapNodeWithSlice(value.Content()), iter.Index() + 1
+			return node.MakeMapNodeWithContent(value.Content()...), iter.Index() + 1
 		}
 
 		a.nd = node.MapRound(a.nd, value)
 
-		return node.MakeMapNodeWithSlice(value.Content()), iter.Index() + 1
+		return node.MakeMapNodeWithContent(value.Content()...), iter.Index() + 1
 	}
 
 	return node.MakeMapNode(), -1
