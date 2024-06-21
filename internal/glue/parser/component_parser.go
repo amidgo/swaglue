@@ -15,7 +15,7 @@ type ComponentParser struct {
 
 func NewSwaggerComponentParser(basePackage string, targetFileFormat FileFormat) *ComponentParser {
 	swaggerComponentFileHandler := &swaggerComponentFileHandler{
-		files: make([]*model.Item, 0),
+		files: make([]model.Item, 0),
 	}
 
 	parser := &fileParser{
@@ -31,10 +31,10 @@ func NewSwaggerComponentParser(basePackage string, targetFileFormat FileFormat) 
 }
 
 type swaggerComponentFileHandler struct {
-	files []*model.Item
+	files []model.Item
 }
 
-func (s *swaggerComponentFileHandler) ComponentItems() []*model.Item {
+func (s *swaggerComponentFileHandler) ComponentItems() []model.Item {
 	return s.files
 }
 
@@ -45,7 +45,7 @@ func (s *swaggerComponentFileHandler) HandleFile(filePath string, file io.Reader
 
 	_, fileName := path.Split(filePath)
 
-	s.files = append(s.files, &model.Item{
+	s.files = append(s.files, model.Item{
 		Name:    fileName,
 		Content: file,
 	})

@@ -7,20 +7,20 @@ import (
 	"path"
 	"strings"
 
-	"github.com/amidgo/swaglue/internal/model"
+	"github.com/amidgo/swaglue/internal/route"
 	"github.com/amidgo/swaglue/pkg/httpmethod"
 	"github.com/amidgo/swaglue/pkg/routes"
 )
 
 type RouteParser struct {
 	basePackage string
-	routes      []*model.Route
+	routes      []route.Route
 }
 
 func NewRouteParser(basePackage string) *RouteParser {
 	return &RouteParser{
 		basePackage: basePackage,
-		routes:      make([]*model.Route, 0),
+		routes:      make([]route.Route, 0),
 	}
 }
 
@@ -76,9 +76,9 @@ func (p *RouteParser) handleRouteEntry(entry os.DirEntry, pathPrefix string) err
 		return fmt.Errorf("read route entry %s, %w", dirPath, err)
 	}
 
-	route := &model.Route{
+	route := route.Route{
 		Name:    routeEntryName(entry),
-		Methods: make([]*model.RouteMethod, 0),
+		Methods: make([]route.Method, 0),
 	}
 
 	for _, entry := range entries {
@@ -93,24 +93,24 @@ func (p *RouteParser) handleRouteEntry(entry os.DirEntry, pathPrefix string) err
 	return nil
 }
 
-func routeEntryMethod(entry os.DirEntry, pathPrefix string) (routeMethod *model.RouteMethod, ok bool) {
+func routeEntryMethod(entry os.DirEntry, pathPrefix string) (routeMethod route.Method, ok bool) {
 	if entry.IsDir() {
-		return nil, false
+		return routeMethod, false
 	}
 
 	method := strings.TrimSuffix(entry.Name(), ".yaml")
 	if !httpmethod.Valid(method) {
-		return nil, false
+		return routeMethod, false
 	}
 
 	filePath := path.Join(pathPrefix, entry.Name())
 
 	f, err := os.Open(filePath)
 	if err != nil {
-		return nil, false
+		return routeMethod, false
 	}
 
-	return &model.RouteMethod{
+	return route.Method{
 		Method:  method,
 		Content: f,
 	}, true
@@ -128,6 +128,6 @@ func isRouteEntry(entry fs.DirEntry) bool {
 	return strings.HasPrefix(entry.Name(), routes.Separator)
 }
 
-func (p *RouteParser) Routes() []*model.Route {
+func (p *RouteParser) Routes() []route.Route {
 	return p.routes
 }

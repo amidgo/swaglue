@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/amidgo/swaglue/internal/glue/parser"
-	"github.com/amidgo/swaglue/internal/model"
+	"github.com/amidgo/swaglue/internal/route"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,10 +35,10 @@ func TestRouteParser(t *testing.T) {
 	err := parser.Parse()
 	require.NoError(t, err, "parse routes")
 
-	expectedRoutes := []*model.Route{
+	expectedRoutes := []route.Route{
 		{
 			Name: "/login/vk",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(loginVKGet),
@@ -51,7 +51,7 @@ func TestRouteParser(t *testing.T) {
 		},
 		{
 			Name: "/group/all",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(groupAllGet),
@@ -60,7 +60,7 @@ func TestRouteParser(t *testing.T) {
 		},
 		{
 			Name: "/user/{id}",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(userGet),
@@ -73,11 +73,11 @@ func TestRouteParser(t *testing.T) {
 	assert.True(t, RoutesEqual(expectedRoutes, parserRoutes), "routes not equal")
 }
 
-func RoutesEqual(routes1, routes2 []*model.Route) bool {
+func RoutesEqual(routes1, routes2 []route.Route) bool {
 	return slices.EqualFunc(routes1, routes2, RouteEqual)
 }
 
-func RouteEqual(route1, route2 *model.Route) bool {
+func RouteEqual(route1, route2 route.Route) bool {
 	if route1.Name != route2.Name {
 		return false
 	}
@@ -85,7 +85,7 @@ func RouteEqual(route1, route2 *model.Route) bool {
 	return slices.EqualFunc(route1.Methods, route2.Methods, RouteMethodEqual)
 }
 
-func RouteMethodEqual(routeMethod1, routeMethod2 *model.RouteMethod) bool {
+func RouteMethodEqual(routeMethod1, routeMethod2 route.Method) bool {
 	if routeMethod1.Method != routeMethod2.Method {
 		return false
 	}

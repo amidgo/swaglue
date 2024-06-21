@@ -12,7 +12,7 @@ import (
 var ErrFailedGlueTags = errors.New("glue tags")
 
 type TagsAppender interface {
-	AppendTags(items []*model.Item) error
+	AppendTags(items []model.Item) error
 }
 
 type TagsGluer struct {

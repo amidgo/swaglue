@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/amidgo/swaglue/internal/model"
+	"github.com/amidgo/swaglue/internal/route"
 	"github.com/amidgo/swaglue/pkg/logger"
 )
 
@@ -13,11 +13,11 @@ var ErrGlueRoutes = errors.New("glue routes")
 
 type RoutesParser interface {
 	Parse() error
-	Routes() []*model.Route
+	Routes() []route.Route
 }
 
 type RoutesAppender interface {
-	AppendRoutes(routes []*model.Route) error
+	AppendRoutes(routes []route.Route) error
 }
 
 type RoutesGluer struct {

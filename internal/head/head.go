@@ -22,7 +22,11 @@ func (e FieldNotFoundError) Error() string {
 }
 
 type Head struct {
-	node.Node
+	nd node.MapNode
+}
+
+func (h *Head) Node() node.MapNode {
+	return h.nd
 }
 
 func ParseHeadFromFile(filePath string, decoder node.DecoderFrom) (*Head, error) {
@@ -39,14 +43,20 @@ func ParseHeadFromFile(filePath string, decoder node.DecoderFrom) (*Head, error)
 	return head, nil
 }
 
+var ErrWrongHeadKind = errors.New("wrong head kind")
+
 func ParseHead(r io.Reader, decoder node.DecoderFrom) (*Head, error) {
-	node, err := decoder.DecodeFrom(r)
+	nd, err := decoder.DecodeFrom(r)
 	if err != nil {
 		return nil, fmt.Errorf("unmarshal data, %w", err)
 	}
 
+	if nd.Kind() != node.Map {
+		return nil, ErrWrongHeadKind
+	}
+
 	return &Head{
-		Node: node,
+		nd: node.MakeMapNodeWithSlice(nd.Content()),
 	}, nil
 }
 
@@ -65,33 +75,10 @@ func (h *Head) SaveToFile(filePath string, flag int, mode os.FileMode, encoder n
 }
 
 func (h *Head) SaveTo(w io.Writer, encoder node.EncoderTo) error {
-	err := encoder.EncodeTo(w, h.Node)
+	err := encoder.EncodeTo(w, h.nd)
 	if err != nil {
 		return fmt.Errorf("save head to writer, %w", err)
 	}
 
 	return nil
-}
-
-func (h *Head) SearchRootTag(tag string) (int, bool) {
-	if h.Type() != node.Map {
-		return 0, false
-	}
-
-	return searchInContent(h.Node, tag)
-}
-
-func searchInContent(node node.Node, tag string) (int, bool) {
-	nodes := node.Content()
-	for i := range nodes {
-		if i == len(nodes)-1 {
-			return 0, false
-		}
-
-		if nodes[i].Value() == tag {
-			return i + 1, true
-		}
-	}
-
-	return 0, false
 }

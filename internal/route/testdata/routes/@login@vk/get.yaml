@@ -1,0 +1,17 @@
+tags:
+  - login
+summary: Login with VK Launch Params
+responses:
+  200:
+    description: return JWT Access Token
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/JwtLoginResponse"
+  400:
+    description: ""
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/ErrorResponse"
+x-codegen-request-body-name: body

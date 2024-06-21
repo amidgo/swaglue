@@ -9,7 +9,7 @@ import (
 	"github.com/amidgo/swaglue/internal/model"
 )
 
-const componenetsTag = "components"
+const componentsTag = "components"
 
 var ErrNoComponentsTag = errors.New("'components' tag not found")
 
@@ -25,30 +25,27 @@ func New(head *head.Head, decoder node.DecoderFrom) *HeadComponentAppender {
 	}
 }
 
-func (h *HeadComponentAppender) AppendComponent(componentName string, componentItems []*model.Item) error {
-	index, ok := h.head.SearchRootTag(componenetsTag)
-	if !ok {
+func (h *HeadComponentAppender) AppendComponent(componentName string, componentItems []model.Item) error {
+	index := node.MapSearchByStringKey(h.head.Node(), componentsTag)
+	if index == -1 {
 		return ErrNoComponentsTag
 	}
 
-	componentTag := h.head.Content()[index]
-
-	if len(componentTag.Content()) == 0 {
-		componentTag = node.MakeMapNode()
-		h.head.Content()[index] = componentTag
-	}
+	componentTag := h.head.Node().Content()[index]
 
 	appender := ComponentAppender{
 		Decoder:        h.decoder,
-		Node:           componentTag,
+		nd:             node.MakeMapNodeWithSlice(componentTag.Content()),
 		ComponentName:  componentName,
 		ComponentItems: componentItems,
 	}
 
-	err := appender.AppendComponent()
+	nd, err := appender.Node()
 	if err != nil {
 		return fmt.Errorf("append component, %w", err)
 	}
+
+	h.head.Node().Content()[index] = nd
 
 	return nil
 }
@@ -56,44 +53,55 @@ func (h *HeadComponentAppender) AppendComponent(componentName string, componentI
 type ComponentAppender struct {
 	Decoder        node.DecoderFrom
 	ComponentName  string
-	ComponentItems []*model.Item
-	Node           node.Node
+	ComponentItems []model.Item
+	nd             node.MapNode
 }
 
-func (a *ComponentAppender) AppendComponent() error {
-	itemNode, exists := a.searchComponentNode()
-	if exists {
-		return a.appendExistComponent(itemNode)
+func (a *ComponentAppender) Node() (nd node.Node, err error) {
+	itemNode, index := a.searchComponentNode()
+	if index != -1 {
+		nd, err = a.appendExistComponent(itemNode)
+		if err != nil {
+			return nil, err
+		}
+
+		a.nd.Content()[index] = nd
+
+		return a.nd, nil
 	}
 
-	return a.appendNewComponent()
+	err = a.appendNewComponent()
+	if err != nil {
+		return nil, err
+	}
+
+	return a.nd, nil
 }
 
-func (a *ComponentAppender) searchComponentNode() (itemNode node.Node, exists bool) {
-	for i := 0; i < len(a.Node.Content()); i += 2 {
-		nd := a.Node.Content()[i]
-		if nd.Kind() != node.String {
+func (a *ComponentAppender) searchComponentNode() (itemNode node.MapNode, index int) {
+	iter := node.NewIndexedIterator(node.MakeMapNodeIterator(a.nd.Content()))
+
+	for iter.HasNext() {
+		key, value := iter.Next()
+
+		if key.Value() != a.ComponentName {
 			continue
 		}
 
-		if nd.Value() != a.ComponentName {
-			continue
+		if iter.Index() != len(a.nd.Content())-1 {
+			return node.MakeMapNodeWithSlice(value.Content()), iter.Index() + 1
 		}
 
-		if i == len(a.Node.Content())-1 {
-			const nodesPerItem = 2
+		a.nd = node.MapRound(a.nd, value)
 
-			return node.MakeMapNodeWithCap(len(a.ComponentItems) * nodesPerItem), true
-		}
-
-		return a.Node.Content()[i+1], true
+		return node.MakeMapNodeWithSlice(value.Content()), iter.Index() + 1
 	}
 
-	return nil, false
+	return node.MakeMapNode(), -1
 }
 
 func (a *ComponentAppender) appendNewComponent() error {
-	nodes, err := new(ComponentNodeBuilder).
+	keyNode, contentNode, err := new(ComponentNodeBuilder).
 		SetDecoder(a.Decoder).
 		SetName(a.ComponentName).
 		SetItems(a.ComponentItems).
@@ -102,27 +110,27 @@ func (a *ComponentAppender) appendNewComponent() error {
 		return err
 	}
 
-	a.Node.SetContent(append(a.Node.Content(), nodes...))
+	a.nd = node.MapAppend(a.nd, keyNode, contentNode)
 
 	return nil
 }
 
-func (a *ComponentAppender) appendExistComponent(itemNode node.Node) error {
+func (a *ComponentAppender) appendExistComponent(itemNode node.MapNode) (node.Node, error) {
 	err := a.validateItemNode(itemNode)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = new(ComponentNodeBuilder).
+	_, contentNode, err := new(ComponentNodeBuilder).
 		SetDecoder(a.Decoder).
 		SetItemNode(itemNode).
 		AppendItems(a.ComponentItems).
-		Err()
+		Build()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return contentNode, nil
 }
 
 var ErrComponentItemNameExists = errors.New("component item name exists")
@@ -151,7 +159,7 @@ func (a *ComponentAppender) validateItemNode(itemNode node.Node) error {
 type ComponentNodeBuilder struct {
 	decoder   node.DecoderFrom
 	namedNode node.Node
-	itemsNode node.Node
+	itemsNode node.MapNode
 	err       error
 }
 
@@ -175,7 +183,7 @@ func (c *ComponentNodeBuilder) SetName(name string) *ComponentNodeBuilder {
 	return c
 }
 
-func (c *ComponentNodeBuilder) SetItemNode(itemsNode node.Node) *ComponentNodeBuilder {
+func (c *ComponentNodeBuilder) SetItemNode(itemsNode node.MapNode) *ComponentNodeBuilder {
 	if c.err != nil {
 		return c
 	}
@@ -185,7 +193,7 @@ func (c *ComponentNodeBuilder) SetItemNode(itemsNode node.Node) *ComponentNodeBu
 	return c
 }
 
-func (c *ComponentNodeBuilder) AppendItems(items []*model.Item) *ComponentNodeBuilder {
+func (c *ComponentNodeBuilder) AppendItems(items []model.Item) *ComponentNodeBuilder {
 	if c.err != nil {
 		return c
 	}
@@ -195,7 +203,7 @@ func (c *ComponentNodeBuilder) AppendItems(items []*model.Item) *ComponentNodeBu
 	return c
 }
 
-func (c *ComponentNodeBuilder) SetItems(items []*model.Item) *ComponentNodeBuilder {
+func (c *ComponentNodeBuilder) SetItems(items []model.Item) *ComponentNodeBuilder {
 	if c.err != nil {
 		return c
 	}
@@ -206,7 +214,7 @@ func (c *ComponentNodeBuilder) SetItems(items []*model.Item) *ComponentNodeBuild
 	return c
 }
 
-func (c *ComponentNodeBuilder) appendComponents(components []*model.Item) {
+func (c *ComponentNodeBuilder) appendComponents(components []model.Item) {
 	for _, component := range components {
 		err := c.appendComponent(component)
 		if err != nil {
@@ -217,7 +225,7 @@ func (c *ComponentNodeBuilder) appendComponents(components []*model.Item) {
 	}
 }
 
-func (c *ComponentNodeBuilder) appendComponent(component *model.Item) error {
+func (c *ComponentNodeBuilder) appendComponent(component model.Item) error {
 	namedNode := node.MakeStringNode(component.Name)
 
 	itemNode, err := c.decoder.DecodeFrom(component.Content)
@@ -225,17 +233,13 @@ func (c *ComponentNodeBuilder) appendComponent(component *model.Item) error {
 		return fmt.Errorf("%w, for %s, %w", head.ErrDecodeFile, component.Name, err)
 	}
 
-	c.appendItems(namedNode, itemNode)
+	c.itemsNode = node.MapAppend(c.itemsNode, namedNode, itemNode)
 
 	return nil
 }
 
-func (c *ComponentNodeBuilder) appendItems(items ...node.Node) {
-	c.itemsNode.SetContent(append(c.itemsNode.Content(), items...))
-}
-
-func (c *ComponentNodeBuilder) Build() ([]node.Node, error) {
-	return []node.Node{c.namedNode, c.itemsNode}, c.err
+func (c *ComponentNodeBuilder) Build() (keyNode, contentNode node.Node, err error) {
+	return c.namedNode, c.itemsNode, c.err
 }
 
 func (c *ComponentNodeBuilder) Err() error {

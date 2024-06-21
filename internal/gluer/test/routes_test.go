@@ -7,7 +7,7 @@ import (
 
 	"github.com/amidgo/swaglue/internal/gluer"
 	gluermocks "github.com/amidgo/swaglue/internal/gluer/mocks"
-	"github.com/amidgo/swaglue/internal/model"
+	"github.com/amidgo/swaglue/internal/route"
 	loggermocks "github.com/amidgo/swaglue/pkg/logger/mocks"
 	"github.com/stretchr/testify/require"
 )
@@ -23,10 +23,10 @@ func Test_RoutesGluer_FailedParseRoutes(t *testing.T) {
 
 func Test_RoutestGluer_FailedAppendRoutes(t *testing.T) {
 	appendErr := os.ErrInvalid
-	routes := []*model.Route{
+	routes := []route.Route{
 		{
 			Name: "dflsdfkjdddlja",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{}, {}, {},
 			},
 		},
@@ -42,10 +42,10 @@ func Test_RoutestGluer_FailedAppendRoutes(t *testing.T) {
 }
 
 func Test_RoutesGluer_Success(t *testing.T) {
-	routes := []*model.Route{
+	routes := []route.Route{
 		{
 			Name: "dflsdfkjdddlja",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{}, {}, {},
 			},
 		},
@@ -83,15 +83,15 @@ func (rt *RoutesGluerTester) ExpectParseRoutes(outErr error) {
 	rt.routesParser.EXPECT().Parse().Return(outErr).Once()
 }
 
-func (rt *RoutesGluerTester) ExpectRoutes(routes []*model.Route) {
+func (rt *RoutesGluerTester) ExpectRoutes(routes []route.Route) {
 	rt.routesParser.EXPECT().Routes().Return(routes).Once()
 }
 
-func (rt *RoutesGluerTester) ExpectRoutesDebugLog(routes []*model.Route) {
+func (rt *RoutesGluerTester) ExpectRoutesDebugLog(routes []route.Route) {
 	rt.debugLogger.EXPECT().Debug("gluer routes", slog.Any("routes", routes))
 }
 
-func (rt *RoutesGluerTester) ExpectAppendRoutes(routes []*model.Route, outErr error) {
+func (rt *RoutesGluerTester) ExpectAppendRoutes(routes []route.Route, outErr error) {
 	rt.routesAppender.EXPECT().AppendRoutes(routes).Return(outErr).Once()
 }
 

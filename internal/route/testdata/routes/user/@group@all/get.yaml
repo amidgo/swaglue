@@ -1,0 +1,22 @@
+tags:
+  - groups
+summary: Get Group Data
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      $ref: "#/components/schemas/ID32"
+responses:
+  200:
+    description: ""
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/Group"
+  400:
+    description: ""
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/ErrorResponse"

@@ -37,12 +37,12 @@ func NewComponentsParser(headNode *head.Head, componentName string, encoder node
 }
 
 func (c *ComponentsParser) Parse() error {
-	index, ok := c.headNode.SearchRootTag(componenetsTag)
-	if !ok {
+	index := node.MapSearchByStringKey(c.headNode.Node(), componenetsTag)
+	if index == -1 {
 		return ErrNoComponentsTag
 	}
 
-	componentsNode := c.headNode.Content()[index]
+	componentsNode := c.headNode.Node().Content()[index]
 	if len(componentsNode.Content()) == 0 {
 		return ErrEmptyComponents
 	}

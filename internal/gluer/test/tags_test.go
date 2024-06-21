@@ -25,7 +25,7 @@ func Test_TagsGluer_FailedParseComponentItems(t *testing.T) {
 
 func Test_TagsGluer_FailedAppendTags(t *testing.T) {
 	appendErr := io.ErrNoProgress
-	componentItems := []*model.Item{
+	componentItems := []model.Item{
 		{
 			Name:    "any component",
 			Content: strings.NewReader("contentik"),
@@ -42,7 +42,7 @@ func Test_TagsGluer_FailedAppendTags(t *testing.T) {
 }
 
 func Test_TagsGluer_Success(t *testing.T) {
-	componentItems := []*model.Item{
+	componentItems := []model.Item{
 		{
 			Name:    "any component",
 			Content: strings.NewReader("contentik"),
@@ -82,18 +82,18 @@ func (gt *TagsGluerTester) ExpectComponentsParse(outErr error) {
 	gt.componentsParser.EXPECT().Parse().Return(outErr).Once()
 }
 
-func (gt *TagsGluerTester) ExpectComponentItems(componentItems []*model.Item) {
+func (gt *TagsGluerTester) ExpectComponentItems(componentItems []model.Item) {
 	gt.componentsParser.EXPECT().ComponentItems().Return(componentItems).Once()
 }
 
-func (gt *TagsGluerTester) ExpectComponentItemsDebugLog(componentItems []*model.Item) {
+func (gt *TagsGluerTester) ExpectComponentItemsDebugLog(componentItems []model.Item) {
 	gt.debugLogger.EXPECT().Debug(
 		"tags component items",
 		slog.Any("componentItems", componentItems),
 	).Once()
 }
 
-func (gt *TagsGluerTester) ExpectAppendTags(componentItems []*model.Item, outErr error) {
+func (gt *TagsGluerTester) ExpectAppendTags(componentItems []model.Item, outErr error) {
 	gt.tagsAppender.EXPECT().AppendTags(componentItems).Return(outErr).Once()
 }
 

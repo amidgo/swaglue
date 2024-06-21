@@ -22,18 +22,13 @@ func New(head *head.Head, decoder node.DecoderFrom) *HeadTagsAppender {
 	return &HeadTagsAppender{head: head, decoder: decoder}
 }
 
-func (h *HeadTagsAppender) AppendTags(tags []*model.Item) error {
-	index, ok := h.head.SearchRootTag(tagsTag)
-	if !ok {
+func (h *HeadTagsAppender) AppendTags(tags []model.Item) error {
+	index := node.MapSearchByStringKey(h.head.Node(), tagsTag)
+	if index == -1 {
 		return ErrNoTagsTag
 	}
 
-	tagsNode := h.head.Content()[index]
-
-	if len(tagsNode.Content()) == 0 {
-		tagsNode = node.MakeArrayNode()
-		h.head.Content()[index] = tagsNode
-	}
+	tagsNode := h.head.Node().Content()[index]
 
 	var tagsExistsNames TagsExistsNames
 
@@ -42,24 +37,26 @@ func (h *HeadTagsAppender) AppendTags(tags []*model.Item) error {
 		return fmt.Errorf("scan tags node, %w", err)
 	}
 
-	appender := TagsAppender{
-		Decoder:         h.decoder,
-		Node:            tagsNode,
-		TagsExistsNames: tagsExistsNames,
+	tagsAppend := TagsAppend{
+		decoder:         h.decoder,
+		arrayNode:       node.MakeArrayNodeWithSlice(tagsNode.Content()),
+		tagsExistsNames: tagsExistsNames,
 	}
 
-	err = appender.AppendTags(tags)
+	nd, err := tagsAppend.Node(tags)
 	if err != nil {
 		return fmt.Errorf("append tags to node, %w", err)
 	}
 
+	h.head.Node().Content()[index] = nd
+
 	return nil
 }
 
-type TagsAppender struct {
-	Decoder         node.DecoderFrom
-	Node            node.Node
-	TagsExistsNames TagsExistsNames
+type TagsAppend struct {
+	decoder         node.DecoderFrom
+	arrayNode       node.ArrayNode
+	tagsExistsNames TagsExistsNames
 }
 
 var (
@@ -67,28 +64,28 @@ var (
 	ErrInvalidContentName = errors.New("tag content name not equal filename")
 )
 
-func (n *TagsAppender) AppendTags(tags []*model.Item) error {
+func (n *TagsAppend) Node(tags []model.Item) (node.Node, error) {
 	for _, tag := range tags {
-		if n.TagsExistsNames.TagNameExists(tag.Name) {
-			return fmt.Errorf("%w, tag name: %s", ErrTagNameExists, tag.Name)
+		if n.tagsExistsNames.TagNameExists(tag.Name) {
+			return nil, fmt.Errorf("%w, tag name: %s", ErrTagNameExists, tag.Name)
 		}
 
-		node, err := n.Decoder.DecodeFrom(tag.Content)
+		nd, err := n.decoder.DecodeFrom(tag.Content)
 		if err != nil {
-			return fmt.Errorf("decode item content, %w", err)
+			return nil, fmt.Errorf("decode item content, %w", err)
 		}
 
-		name, err := extractTagNodeName(node)
+		name, err := extractTagNodeName(nd)
 		if err != nil {
-			return fmt.Errorf("extract tag node name, %w", err)
+			return nil, fmt.Errorf("extract tag node name, %w", err)
 		}
 
 		if tag.Name != name {
-			return fmt.Errorf("%w, file name: %s", ErrInvalidContentName, tag.Name)
+			return nil, fmt.Errorf("%w, file name: %s", ErrInvalidContentName, tag.Name)
 		}
 
-		n.Node.AppendNode(node)
+		n.arrayNode = node.ArrayAppend(n.arrayNode, nd)
 	}
 
-	return nil
+	return n.arrayNode, nil
 }

@@ -32,7 +32,7 @@ func Test_Head_AppendComponent(t *testing.T) {
 
 	appender := componentsappender.New(hd, new(yaml.Decoder))
 
-	err = appender.AppendComponent("schemas", []*model.Item{
+	err = appender.AppendComponent("schemas", []model.Item{
 		{
 			Name:    "EducationPeriod",
 			Content: bytes.NewReader(educationPeriodSchema),
@@ -57,7 +57,7 @@ func Test_Head_AppendComponent_ExistsComponent(t *testing.T) {
 
 	appender := componentsappender.New(hd, new(yaml.Decoder))
 
-	err = appender.AppendComponent("random_component", []*model.Item{
+	err = appender.AppendComponent("random_component", []model.Item{
 		{
 			Name:    "EducationPeriod",
 			Content: bytes.NewReader(educationPeriodSchema),
@@ -73,7 +73,7 @@ func Test_Head_AppendComponent_ExistsComponent(t *testing.T) {
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
 	require.NoError(t, err, "save file")
 
-	assert.Equal(t, existsComponentExpectedSwagger, buf.Bytes())
+	assert.Equal(t, string(existsComponentExpectedSwagger), buf.String())
 }
 
 func Test_Head_AppendComponent_ExistsComponentItemName(t *testing.T) {
@@ -82,7 +82,7 @@ func Test_Head_AppendComponent_ExistsComponentItemName(t *testing.T) {
 
 	appender := componentsappender.New(hd, new(yaml.Decoder))
 
-	err = appender.AppendComponent("random_component", []*model.Item{
+	err = appender.AppendComponent("random_component", []model.Item{
 		{
 			Name:    "EducationPeriod",
 			Content: bytes.NewReader(educationPeriodSchema),

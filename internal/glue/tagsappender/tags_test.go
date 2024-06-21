@@ -33,7 +33,7 @@ func Test_AppendTags_Success(t *testing.T) {
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 
-	err = appender.AppendTags([]*model.Item{
+	err = appender.AppendTags([]model.Item{
 		{
 			Name:    "haters",
 			Content: bytes.NewReader(hatersTagData),
@@ -62,7 +62,7 @@ func Test_AppendTags_EmptyTags(t *testing.T) {
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 
-	err = appender.AppendTags([]*model.Item{
+	err = appender.AppendTags([]model.Item{
 		{
 			Name:    "haters",
 			Content: bytes.NewReader(hatersTagData),
@@ -91,7 +91,7 @@ func Test_AppendTags_Wrong_Name(t *testing.T) {
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 
-	err = appender.AppendTags([]*model.Item{
+	err = appender.AppendTags([]model.Item{
 		{
 			Name:    "haters",
 			Content: bytes.NewReader(hatersTagData),
@@ -114,7 +114,7 @@ func Test_AppendTags_TagNameExists(t *testing.T) {
 
 	appender := tagsappender.New(hd, new(yaml.Decoder))
 
-	err = appender.AppendTags([]*model.Item{
+	err = appender.AppendTags([]model.Item{
 		{
 			Name:    "haters",
 			Content: bytes.NewReader(hatersTagData),

@@ -31,12 +31,12 @@ func New(head *head.Head, decoder node.DecoderFrom) *HeadPathSetter {
 }
 
 func (h *HeadPathSetter) SetPaths(paths map[string]io.Reader) error {
-	index, ok := h.head.SearchRootTag(pathsTag)
-	if !ok {
+	index := node.MapSearchByStringKey(h.head.Node(), pathsTag)
+	if index == -1 {
 		return ErrNoPathTag
 	}
 
-	pathNode := h.head.Content()[index]
+	pathNode := h.head.Node().Content()[index]
 
 	err := validatePathNode(pathNode)
 	if err != nil {
@@ -57,7 +57,7 @@ func (h *HeadPathSetter) SetPaths(paths map[string]io.Reader) error {
 }
 
 func validatePathNode(pathNode node.Node) error {
-	if pathNode.Type() != node.Map {
+	if pathNode.Kind() != node.Map {
 		return fmt.Errorf("%w, actual %s", ErrWrongPathKind, pathNode.Type())
 	}
 
@@ -106,7 +106,7 @@ func (p *PathsSetter) SetPathRefs(paths map[string]io.Reader) error {
 }
 
 func (p *PathsSetter) isContentableNodeKind() bool {
-	return p.Node.Type() == node.Map || p.Node.Type() == node.Array
+	return p.Node.Kind() == node.Map || p.Node.Kind() == node.Array
 }
 
 type PathRouteMethod string

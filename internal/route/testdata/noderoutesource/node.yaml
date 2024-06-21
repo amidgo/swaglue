@@ -1,0 +1,73 @@
+/user/{id}:
+  get:
+    tags:
+      - teachers
+    summary: Get All users who are teachers with pagination
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/ID32"
+    responses:
+      200:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeacherData"
+      400:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+/login/vk:
+  get:
+    tags:
+      - login
+    summary: Login with VK Launch Params
+    responses:
+      200:
+        description: return JWT Access Token
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JwtLoginResponse"
+      400:
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+    x-codegen-request-body-name: body
+  post:
+    tags:
+      - login
+    summary: Authorization by Login And Password
+    requestBody:
+      required: true
+      description: "login and password"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LoginBody"
+    responses:
+      200:
+        description: On Successfull Authorization Set Cookie
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginPasswordResponse"
+        headers:
+          Set-Cookie:
+            schema:
+              type: string
+              example: session_id=<UUID>; HttpOnly; Secure
+      400:
+        description: "wrong password or user with login not found"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ErrorResponse"
+    x-codegen-request-body-name: body

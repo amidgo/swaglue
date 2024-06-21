@@ -8,7 +8,7 @@ import (
 	"github.com/amidgo/node/yaml"
 	"github.com/amidgo/swaglue/internal/glue/routesappender"
 	"github.com/amidgo/swaglue/internal/head"
-	"github.com/amidgo/swaglue/internal/model"
+	"github.com/amidgo/swaglue/internal/route"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -29,11 +29,11 @@ var (
 	expectedExistsPaths []byte
 )
 
-func routes() []*model.Route {
-	return []*model.Route{
+func routes() []route.Route {
+	return []route.Route{
 		{
 			Name: "/login/vk",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(loginVKGet),
@@ -42,7 +42,7 @@ func routes() []*model.Route {
 		},
 		{
 			Name: "/login/vk",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "post",
 					Content: bytes.NewReader(loginVKPost),
@@ -51,7 +51,7 @@ func routes() []*model.Route {
 		},
 		{
 			Name: "/login/vk",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(loginVKGet),
@@ -64,7 +64,7 @@ func routes() []*model.Route {
 		},
 		{
 			Name: "/group/all",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(groupAllGet),
@@ -73,7 +73,7 @@ func routes() []*model.Route {
 		},
 		{
 			Name: "/group/all",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(groupAllGet),
@@ -82,7 +82,7 @@ func routes() []*model.Route {
 		},
 		{
 			Name: "/user/{id}",
-			Methods: []*model.RouteMethod{
+			Methods: []route.Method{
 				{
 					Method:  "get",
 					Content: bytes.NewReader(UserIDGet),
@@ -96,7 +96,7 @@ func TestAppendRoutes_EmptyPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/routes/routes_with_empty_paths.yaml", new(yaml.Decoder))
 	require.NoError(t, err, "open routes_with_empty_paths.yaml")
 
-	appender := routesappender.New(hd, new(yaml.Decoder))
+	appender := routesappender.New(hd, new(yaml.Decoder), new(yaml.Encoder))
 
 	err = appender.AppendRoutes(routes())
 	require.NoError(t, err, "append routes")
@@ -105,14 +105,14 @@ func TestAppendRoutes_EmptyPaths(t *testing.T) {
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
 	require.NoError(t, err, "save file")
 
-	assert.Equal(t, expectedEmptyPaths, buf.Bytes())
+	assert.Equal(t, string(expectedEmptyPaths), buf.String())
 }
 
 func TestAppendRoutes_ExistsPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/routes/routes_with_exists_paths.yaml", new(yaml.Decoder))
 	require.NoError(t, err, "open routes_with_exists_paths.yaml")
 
-	appender := routesappender.New(hd, new(yaml.Decoder))
+	appender := routesappender.New(hd, new(yaml.Decoder), &yaml.Encoder{Indent: 2})
 
 	err = appender.AppendRoutes(routes())
 	require.NoError(t, err, "append routes")
@@ -121,5 +121,5 @@ func TestAppendRoutes_ExistsPaths(t *testing.T) {
 	err = hd.SaveTo(buf, &yaml.Encoder{Indent: 2})
 	require.NoError(t, err, "save file")
 
-	assert.Equal(t, expectedExistsPaths, buf.Bytes())
+	assert.Equal(t, string(expectedExistsPaths), buf.String())
 }

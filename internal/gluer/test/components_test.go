@@ -27,7 +27,7 @@ func Test_ComponentsGluer_FailedParseComponentItems(t *testing.T) {
 func Test_ComponentsGluer_FailedAppendComponentItems(t *testing.T) {
 	appendErr := io.ErrNoProgress
 	componentName := "component name"
-	componentItems := []*model.Item{
+	componentItems := []model.Item{
 		{
 			Name:    "any component",
 			Content: strings.NewReader("contentik"),
@@ -45,7 +45,7 @@ func Test_ComponentsGluer_FailedAppendComponentItems(t *testing.T) {
 
 func Test_ComponentsGluer_Success(t *testing.T) {
 	componentName := "component name"
-	componentItems := []*model.Item{
+	componentItems := []model.Item{
 		{
 			Name:    "any component",
 			Content: strings.NewReader("contentik"),
@@ -86,7 +86,7 @@ func (ct *ComponentsGluerTester) ExpectComponentsParse(outErr error) {
 	ct.componentsParser.EXPECT().Parse().Return(outErr).Once()
 }
 
-func (ct *ComponentsGluerTester) ExpectComponentItemsDebugLog(componentItems []*model.Item) {
+func (ct *ComponentsGluerTester) ExpectComponentItemsDebugLog(componentItems []model.Item) {
 	ct.debugLogger.EXPECT().Debug(
 		"component items",
 		slog.String("componentName", ct.ComponentName),
@@ -94,11 +94,11 @@ func (ct *ComponentsGluerTester) ExpectComponentItemsDebugLog(componentItems []*
 	).Once()
 }
 
-func (ct *ComponentsGluerTester) ExpectComponentItems(outItems []*model.Item) {
+func (ct *ComponentsGluerTester) ExpectComponentItems(outItems []model.Item) {
 	ct.componentsParser.EXPECT().ComponentItems().Return(outItems).Once()
 }
 
-func (ct *ComponentsGluerTester) ExpectComponentItemsAppend(items []*model.Item, outErr error) {
+func (ct *ComponentsGluerTester) ExpectComponentItemsAppend(items []model.Item, outErr error) {
 	ct.componentsAppender.EXPECT().AppendComponent(ct.ComponentName, items).Return(outErr).Once()
 }
 

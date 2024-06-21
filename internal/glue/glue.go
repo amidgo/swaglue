@@ -53,7 +53,7 @@ func Exec() {
 			gluer.NewRoutesGluer(
 				logger,
 				parser.NewRouteParser(config.Routes),
-				routesappender.New(head, decoder),
+				routesappender.New(head, decoder, encoder),
 			),
 		)
 	}

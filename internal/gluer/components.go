@@ -13,11 +13,11 @@ var ErrGlueComponent = errors.New("glue component")
 
 type ComponentsParser interface {
 	Parse() error
-	ComponentItems() []*model.Item
+	ComponentItems() []model.Item
 }
 
 type ComponentsAppender interface {
-	AppendComponent(componentName string, componentItems []*model.Item) error
+	AppendComponent(componentName string, componentItems []model.Item) error
 }
 
 type ComponentsGluer struct {
