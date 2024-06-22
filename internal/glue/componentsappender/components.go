@@ -207,6 +207,7 @@ func (c *ComponentNodeBuilder) SetItems(items []model.Item) *ComponentNodeBuilde
 	if c.err != nil {
 		return c
 	}
+
 	content := make([]node.Node, 0, len(items))
 
 	c.itemsNode = node.MakeMapNode(content...)
