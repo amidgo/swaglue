@@ -92,8 +92,6 @@ func (a *ComponentAppender) searchComponentNode() (itemNode node.MapNode, index 
 			return node.MakeMapNode(value.Content()...), iter.Index() + 1
 		}
 
-		a.nd = node.MapRound(a.nd, value)
-
 		return node.MakeMapNode(value.Content()...), iter.Index() + 1
 	}
 

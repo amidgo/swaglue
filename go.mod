@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.0
 
 require (
-	github.com/amidgo/node v0.0.12
+	github.com/amidgo/node v0.0.13
 	github.com/amidgo/tester v0.0.5
 	github.com/stretchr/testify v1.8.4
 	github.com/wk8/go-ordered-map/v2 v2.1.8
