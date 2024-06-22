@@ -56,7 +56,7 @@ func ParseHead(r io.Reader, decoder node.DecoderFrom) (*Head, error) {
 	}
 
 	return &Head{
-		nd: node.MakeMapNodeWithContent(nd.Content()...),
+		nd: node.MakeMapNode(nd.Content()...),
 	}, nil
 }
 
