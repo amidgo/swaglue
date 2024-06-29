@@ -13,7 +13,7 @@ import (
 	"github.com/amidgo/swaglue/internal/glue/componentsappender"
 	"github.com/amidgo/swaglue/internal/glue/parser"
 	"github.com/amidgo/swaglue/internal/glue/pathssetter"
-	"github.com/amidgo/swaglue/internal/glue/routesappender"
+	"github.com/amidgo/swaglue/internal/glue/routesiterationstep"
 	"github.com/amidgo/swaglue/internal/glue/tagsappender"
 	"github.com/amidgo/swaglue/internal/gluer"
 	"github.com/amidgo/swaglue/internal/head"
@@ -53,7 +53,7 @@ func Exec() {
 			gluer.NewRoutesGluer(
 				logger,
 				parser.NewRouteParser(config.Routes),
-				routesappender.New(head, decoder, encoder),
+				routesiterationstep.New(head, decoder, encoder, nil),
 			),
 		)
 	}

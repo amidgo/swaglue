@@ -1,4 +1,4 @@
-package routesappender_test
+package routesiterationstep_test
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/amidgo/node/yaml"
-	"github.com/amidgo/swaglue/internal/glue/routesappender"
+	"github.com/amidgo/swaglue/internal/glue/routesiterationstep"
 	"github.com/amidgo/swaglue/internal/head"
 	"github.com/amidgo/swaglue/internal/route"
 	"github.com/stretchr/testify/assert"
@@ -96,7 +96,7 @@ func TestAppendRoutes_EmptyPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/routes/routes_with_empty_paths.yaml", new(yaml.Decoder))
 	require.NoError(t, err, "open routes_with_empty_paths.yaml")
 
-	appender := routesappender.New(hd, new(yaml.Decoder), new(yaml.Encoder))
+	appender := routesiterationstep.New(hd, new(yaml.Decoder), new(yaml.Encoder), route.SliceSource(routes()))
 
 	err = appender.AppendRoutes(routes())
 	require.NoError(t, err, "append routes")
@@ -112,7 +112,7 @@ func TestAppendRoutes_ExistsPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/routes/routes_with_exists_paths.yaml", new(yaml.Decoder))
 	require.NoError(t, err, "open routes_with_exists_paths.yaml")
 
-	appender := routesappender.New(hd, new(yaml.Decoder), &yaml.Encoder{Indent: 2})
+	appender := routesiterationstep.New(hd, new(yaml.Decoder), &yaml.Encoder{Indent: 2}, route.SliceSource(routes()))
 
 	err = appender.AppendRoutes(routes())
 	require.NoError(t, err, "append routes")
