@@ -123,11 +123,15 @@ func routeMethods(route Route) []string {
 	return methods
 }
 
-var ErrEncodeNode = errors.New("encode node")
+var (
+	ErrEncodeNode      = errors.New("encode node")
+	ErrInvalidNodeKind = errors.New("invalid node kind")
+)
 
 type NodeRouteSource struct {
-	nd      node.Node
-	encoder node.EncoderTo
+	nd       node.Node
+	encoder  node.EncoderTo
+	validate node.Validate
 }
 
 func NewNodeRouteSource(
@@ -135,12 +139,18 @@ func NewNodeRouteSource(
 	encoder node.EncoderTo,
 ) NodeRouteSource {
 	return NodeRouteSource{
-		nd:      nd,
-		encoder: encoder,
+		nd:       nd,
+		encoder:  encoder,
+		validate: node.NewKindValidate(node.Map, node.Empty),
 	}
 }
 
 func (n NodeRouteSource) Routes() ([]Route, error) {
+	err := n.validate.Validate(n.nd)
+	if err != nil {
+		return nil, err
+	}
+
 	routes := make([]Route, 0)
 
 	iter := node.MakeMapNodeIterator(n.nd.Content())
@@ -166,9 +176,9 @@ func (n NodeRouteSource) Routes() ([]Route, error) {
 func (n NodeRouteSource) routeExistsMethods(methods node.Node) ([]Method, error) {
 	routeMethods := make([]Method, 0)
 
-	iterator := node.MakeMapNodeIterator(methods.Content())
-	for iterator.HasNext() {
-		key, content := iterator.Next()
+	iter := node.MakeMapNodeIterator(methods.Content())
+	for iter.HasNext() {
+		key, content := iter.Next()
 		if !httpmethod.Valid(key.Value()) {
 			return nil, httpmethod.ErrInvalidMethod
 		}

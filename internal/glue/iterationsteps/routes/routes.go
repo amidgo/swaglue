@@ -1,4 +1,4 @@
-package routesiterationstep
+package routes
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ var (
 	ErrNoPathTag            = errors.New("no path tag")
 )
 
-type RoutesIterationStep struct {
+type IterationStep struct {
 	head        *head.Head
 	decoder     node.DecoderFrom
 	encoder     node.EncoderTo
@@ -28,8 +28,8 @@ func New(
 	decoder node.DecoderFrom,
 	encoder node.EncoderTo,
 	routeSource route.Source,
-) *RoutesIterationStep {
-	return &RoutesIterationStep{
+) *IterationStep {
+	return &IterationStep{
 		head:        head,
 		decoder:     decoder,
 		encoder:     encoder,
@@ -37,7 +37,7 @@ func New(
 	}
 }
 
-func (h *RoutesIterationStep) AppendRoutes(routes []route.Route) (err error) {
+func (h *IterationStep) AppendRoutes(routes []route.Route) (err error) {
 	index := node.MapSearchByStringKey(h.head.Node(), pathsTag)
 	if index == -1 {
 		return ErrNoPathTag
@@ -61,7 +61,7 @@ func (h *RoutesIterationStep) AppendRoutes(routes []route.Route) (err error) {
 	return nil
 }
 
-func (h *RoutesIterationStep) KeyValue(key, value node.Node) (resKey, resValue node.Node, err error) {
+func (h *IterationStep) KeyValue(key, value node.Node) (resKey, resValue node.Node, err error) {
 	if key.Kind() != node.String || key.Value() != pathsTag {
 		return key, value, nil
 	}
