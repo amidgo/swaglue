@@ -1,4 +1,4 @@
-package pathssetter_test
+package paths_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/amidgo/node/yaml"
-	"github.com/amidgo/swaglue/internal/glue/pathssetter"
+	"github.com/amidgo/swaglue/internal/glue/iterationsteps/paths"
 	"github.com/amidgo/swaglue/internal/head"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,7 +27,7 @@ func TestPaths(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
 	require.NoError(t, err, "open swagger.yaml")
 
-	pathsSetter := pathssetter.New(hd, new(yaml.Decoder))
+	pathsSetter := paths.New(hd, new(yaml.Decoder), nil)
 
 	err = pathsSetter.SetPaths(map[string]io.Reader{
 		"#/paths/get":  bytes.NewReader(getPathData),
@@ -46,11 +46,11 @@ func TestPaths_InvalidRef(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
 	require.NoError(t, err, "open swagger.yaml")
 
-	pathsSetter := pathssetter.New(hd, new(yaml.Decoder))
+	pathsSetter := paths.New(hd, new(yaml.Decoder), nil)
 
 	err = pathsSetter.SetPaths(map[string]io.Reader{
 		"#/paths/get": bytes.NewReader(getPathData),
 	})
 
-	require.ErrorIs(t, err, pathssetter.ErrInvalidRef)
+	require.ErrorIs(t, err, paths.ErrInvalidRef)
 }

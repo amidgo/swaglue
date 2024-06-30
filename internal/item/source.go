@@ -16,7 +16,10 @@ func (s SliceSource) Items() ([]Item, error) {
 	return s, nil
 }
 
-var ErrJoinItemsSources = errors.New("join items sources")
+var (
+	ErrGetItemsFromSource = errors.New("get items from source")
+	ErrInvalidNode        = errors.New("invalid node")
+)
 
 type JoinSource struct {
 	sources []Source
@@ -33,7 +36,7 @@ func (j JoinSource) Items() ([]Item, error) {
 	for _, source := range j.sources {
 		routes, err := source.Items()
 		if err != nil {
-			return nil, errors.Join(ErrJoinItemsSources, err)
+			return nil, errors.Join(ErrGetItemsFromSource, err)
 		}
 
 		totalSize += len(routes)
@@ -66,10 +69,12 @@ func NewNodeSource(nd node.Node) NodeSource {
 func (n NodeSource) Items() ([]Item, error) {
 	err := n.validate.Validate(n.nd)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(ErrInvalidNode, err)
 	}
 
-	items := make([]Item, 0, len(n.nd.Content())/2)
+	const nodesPerItem = 2
+
+	items := make([]Item, 0, len(n.nd.Content())/nodesPerItem)
 
 	iter := node.MakeMapNodeIterator(n.nd.Content())
 	for iter.HasNext() {
@@ -94,7 +99,7 @@ func NewRemoveDuplicatesSource(source Source) RemoveDuplicatesSource {
 func (r RemoveDuplicatesSource) Items() ([]Item, error) {
 	items, err := r.source.Items()
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(ErrGetItemsFromSource, err)
 	}
 
 	uniqueItems := make([]Item, 0, len(items))
@@ -107,6 +112,7 @@ func (r RemoveDuplicatesSource) Items() ([]Item, error) {
 		}
 
 		existsNames[item.Name] = struct{}{}
+
 		uniqueItems = append(uniqueItems, item)
 	}
 

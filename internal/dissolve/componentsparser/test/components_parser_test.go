@@ -96,7 +96,6 @@ func (c *ComponentsParserTester) assertComponentsEqual(t *testing.T, components 
 	assert.True(t, equal, "slices not equal")
 }
 
-//nolint:funlen // too long because too many cases
 func Test_ComponentsParser(t *testing.T) {
 	hd, err := head.ParseHeadFromFile("testdata/swagger.yaml", new(yaml.Decoder))
 	require.NoError(t, err)

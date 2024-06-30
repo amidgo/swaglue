@@ -1,4 +1,4 @@
-package pathssetter
+package paths
 
 import (
 	"errors"
@@ -13,20 +13,35 @@ import (
 const pathsTag = "paths"
 
 var (
-	ErrNoPathTag     = errors.New("'paths' tag not found")
-	ErrWrongPathKind = errors.New("wrong path type, expected map")
-	ErrInvalidRef    = errors.New("invalid ref value")
+	ErrNoPathTag          = errors.New("'paths' tag not found")
+	ErrInvalidRef         = errors.New("invalid ref value")
+	ErrInvalidNode        = errors.New("invalid node")
+	ErrGetPathsFromSource = errors.New("get paths from source")
 )
 
-type HeadPathSetter struct {
-	head    *head.Head
-	decoder node.DecoderFrom
+type Source interface {
+	Paths() (map[string]io.Reader, error)
 }
 
-func New(head *head.Head, decoder node.DecoderFrom) *HeadPathSetter {
+type MapSource map[string]io.Reader
+
+func (m MapSource) Paths() (map[string]io.Reader, error) {
+	return m, nil
+}
+
+type HeadPathSetter struct {
+	head        *head.Head
+	decoder     node.DecoderFrom
+	validate    node.Validate
+	pathsSource Source
+}
+
+func New(head *head.Head, decoder node.DecoderFrom, pathsSource Source) *HeadPathSetter {
 	return &HeadPathSetter{
-		head:    head,
-		decoder: decoder,
+		head:        head,
+		decoder:     decoder,
+		validate:    node.NewKindValidate(node.Map),
+		pathsSource: pathsSource,
 	}
 }
 
@@ -38,14 +53,14 @@ func (h *HeadPathSetter) SetPaths(paths map[string]io.Reader) error {
 
 	pathNode := h.head.Node().Content()[index]
 
-	err := validatePathNode(pathNode)
+	err := h.validate.Validate(pathNode)
 	if err != nil {
-		return err
+		return errors.Join(ErrInvalidNode, err)
 	}
 
 	pathChilds := pathNode.Content()
 	for i := range pathChilds {
-		route := PathsSetter{Node: pathChilds[i], Decoder: h.decoder}
+		route := Setter{Node: pathChilds[i], Decoder: h.decoder}
 
 		err := route.SetPathRefs(paths)
 		if err != nil {
@@ -56,20 +71,40 @@ func (h *HeadPathSetter) SetPaths(paths map[string]io.Reader) error {
 	return nil
 }
 
-func validatePathNode(pathNode node.Node) error {
-	if pathNode.Kind() != node.Map {
-		return fmt.Errorf("%w, actual %s", ErrWrongPathKind, pathNode.Type())
+func (h *HeadPathSetter) KeyValue(key, value node.Node) (resKey, resValue node.Node, err error) {
+	if !node.StringEquals(key, pathsTag) {
+		return key, value, nil
 	}
 
-	return nil
+	paths, err := h.pathsSource.Paths()
+	if err != nil {
+		return nil, nil, errors.Join(ErrGetPathsFromSource, err)
+	}
+
+	err = h.validate.Validate(value)
+	if err != nil {
+		return nil, nil, errors.Join(ErrInvalidNode, err)
+	}
+
+	pathChilds := value.Content()
+	for i := range pathChilds {
+		route := Setter{Node: pathChilds[i], Decoder: h.decoder}
+
+		err := route.SetPathRefs(paths)
+		if err != nil {
+			return nil, nil, fmt.Errorf("handle paths, %w", err)
+		}
+	}
+
+	return key, value, nil
 }
 
-type PathsSetter struct {
+type Setter struct {
 	Node    node.Node
 	Decoder node.DecoderFrom
 }
 
-func (p *PathsSetter) SetPathRefs(paths map[string]io.Reader) error {
+func (p *Setter) SetPathRefs(paths map[string]io.Reader) error {
 	if !p.isContentableNodeKind() {
 		return nil
 	}
@@ -105,7 +140,7 @@ func (p *PathsSetter) SetPathRefs(paths map[string]io.Reader) error {
 	return nil
 }
 
-func (p *PathsSetter) isContentableNodeKind() bool {
+func (p *Setter) isContentableNodeKind() bool {
 	return p.Node.Kind() == node.Map || p.Node.Kind() == node.Array
 }
 

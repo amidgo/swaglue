@@ -1,8 +1,15 @@
 package componentsappender
 
 import (
+	"errors"
+
 	"github.com/amidgo/node"
 	"github.com/amidgo/swaglue/internal/item"
+)
+
+var (
+	ErrIterationSource = errors.New("iterate on component node")
+	ErrInvalidNode     = errors.New("invalid node")
 )
 
 type ComponentIterationStep struct {
@@ -47,7 +54,9 @@ func (c componentNodeSource) ComponentNode() (node.MapNode, error) {
 		return node.MakeMapNode(), err
 	}
 
-	mapNode := node.MakeMapNode(make([]node.Node, 0, len(items)*2)...)
+	const nodesPerItem = 2
+
+	mapNode := node.MakeMapNode(make([]node.Node, 0, len(items)*nodesPerItem)...)
 
 	for _, item := range items {
 		mapNode = node.MapAppend(mapNode, node.MakeStringNode(item.Name), item.Content)
@@ -96,7 +105,7 @@ func (i IterationStep) KeyValue(key, value node.Node) (resKey, resValue node.Nod
 
 	componentNode, err := gen.MapNode()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Join(ErrIterationSource, err)
 	}
 
 	return key, componentNode, nil
@@ -119,7 +128,7 @@ func newfilledWithNamesComponentNode(names []string, componentNode node.Node) fi
 func (f filledWithNamesComponentNode) MapNode() (node.MapNode, error) {
 	err := f.validate.Validate(f.componentNode)
 	if err != nil {
-		return node.MakeMapNode(), err
+		return node.MakeMapNode(), errors.Join(ErrInvalidNode, err)
 	}
 
 	names := f.makeNames()

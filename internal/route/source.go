@@ -124,8 +124,8 @@ func routeMethods(route Route) []string {
 }
 
 var (
-	ErrEncodeNode      = errors.New("encode node")
-	ErrInvalidNodeKind = errors.New("invalid node kind")
+	ErrEncodeNode  = errors.New("encode node")
+	ErrInvalidNode = errors.New("invalid node")
 )
 
 type NodeRouteSource struct {
@@ -148,7 +148,7 @@ func NewNodeRouteSource(
 func (n NodeRouteSource) Routes() ([]Route, error) {
 	err := n.validate.Validate(n.nd)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(ErrInvalidNode, err)
 	}
 
 	routes := make([]Route, 0)
